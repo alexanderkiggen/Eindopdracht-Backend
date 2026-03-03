@@ -33,4 +33,8 @@ public class Ticket {
     @ManyToOne
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
+
+    @ManyToOne
+    @JoinColumn(name = "assigned_user_id")
+    private User assignedUser;
 }
