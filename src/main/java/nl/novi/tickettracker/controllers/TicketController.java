@@ -25,9 +25,12 @@ public class TicketController {
         this.ticketService = ticketService;
     }
 
-    @PostMapping
-    public ResponseEntity<TicketOutputDto> createTicket(@Valid @RequestBody TicketInputDto ticketInputDto) {
-        TicketOutputDto ticketOutputDto = ticketService.createTicket(ticketInputDto);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<TicketOutputDto> createTicket(
+            @RequestPart("ticket") @Valid TicketInputDto ticketInputDto,
+            @RequestPart("file") MultipartFile file) throws IOException {
+
+        TicketOutputDto ticketOutputDto = ticketService.createTicket(ticketInputDto, file);
         return new ResponseEntity<>(ticketOutputDto, HttpStatus.CREATED); // Status code: 201 Created
     }
 

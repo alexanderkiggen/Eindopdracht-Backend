@@ -15,6 +15,9 @@ public class TicketInputDto {
 
     public String description;
 
+    @NotBlank(message = "Assigned user is mandatory")
+    public String assignedUsername;
+
     @NotNull(message = "Ticket type is mandatory")
     public TicketType type;
 

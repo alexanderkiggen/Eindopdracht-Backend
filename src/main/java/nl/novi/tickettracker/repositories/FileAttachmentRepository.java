@@ -4,4 +4,5 @@ import nl.novi.tickettracker.models.FileAttachment;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface FileAttachmentRepository extends JpaRepository<FileAttachment, Integer> {
+    java.util.List<FileAttachment> findByTicketId(Integer ticketId);
 }

@@ -14,4 +14,5 @@ public class TicketOutputDto {
     public TicketType type;
     public Integer projectId;
     public String assignedUsername;
+    public java.util.List<FileAttachmentOutputDto> files;
 }

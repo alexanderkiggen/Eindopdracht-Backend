@@ -1,23 +1,24 @@
 package nl.novi.tickettracker.services;
 
+import nl.novi.tickettracker.dtos.FileAttachmentOutputDto;
 import nl.novi.tickettracker.dtos.TicketInputDto;
 import nl.novi.tickettracker.dtos.TicketOutputDto;
 import nl.novi.tickettracker.exceptions.RecordNotFoundException;
+import nl.novi.tickettracker.models.FileAttachment;
 import nl.novi.tickettracker.models.Project;
 import nl.novi.tickettracker.models.Ticket;
 import nl.novi.tickettracker.models.User;
+import nl.novi.tickettracker.repositories.FileAttachmentRepository;
 import nl.novi.tickettracker.repositories.ProjectRepository;
 import nl.novi.tickettracker.repositories.TicketRepository;
 import nl.novi.tickettracker.repositories.UserRepository;
-import nl.novi.tickettracker.dtos.FileAttachmentOutputDto;
-import nl.novi.tickettracker.models.FileAttachment;
-import nl.novi.tickettracker.repositories.FileAttachmentRepository;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
-import java.util.Objects;
 
-import org.springframework.stereotype.Service;
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 public class TicketService {
@@ -35,9 +36,19 @@ public class TicketService {
     }
 
     // Nieuw Ticket aanmaken
-    public TicketOutputDto createTicket(TicketInputDto ticketInputDto) {
+    public TicketOutputDto createTicket(TicketInputDto ticketInputDto, MultipartFile file) throws IOException {
+        // Stap 1. Maak het ticket
         Ticket ticketEntity = transferToTicket(ticketInputDto);
         Ticket savedTicketEntity = ticketRepository.save(ticketEntity);
+
+        // Stap 2. Koppel het verplichte bestand
+        FileAttachment attachment = new FileAttachment();
+        attachment.setFileName(StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename())));
+        attachment.setContentType(file.getContentType());
+        attachment.setData(file.getBytes());
+        attachment.setTicket(savedTicketEntity);
+        fileAttachmentRepository.save(attachment);
+
         return transferToDto(savedTicketEntity);
     }
 
@@ -45,7 +56,7 @@ public class TicketService {
     public TicketOutputDto assignDeveloperToTicket(Integer ticketId, String username) {
 
         Ticket ticketEntity = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new RecordNotFoundException("Ticket with   ID " + ticketId + " not found."));
+                .orElseThrow(() -> new RecordNotFoundException("Ticket with ID " + ticketId + " not found."));
 
         User userEntity = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RecordNotFoundException("User with username '" + username + "' not found."));
@@ -63,9 +74,15 @@ public class TicketService {
         ticket.setType(dto.getType()); // TODO: Enum gebruiken uit TicketType
         // TODO: Status toevoegen
 
+        // Stap 1. Koppel het verplichte Project
         Project project = projectRepository.findById(dto.getProjectId())
                 .orElseThrow(() -> new RecordNotFoundException("Project with ID " + dto.getProjectId() + " not found."));
         ticket.setProject(project);
+
+        // Stap 2. Koppel de verplichte User
+        User user = userRepository.findByUsername(dto.getAssignedUsername())
+                .orElseThrow(() -> new RecordNotFoundException("User with username '" + dto.getAssignedUsername() + "' not found."));
+        ticket.setAssignedUser(user);
 
         return ticket;
     }
@@ -83,9 +100,24 @@ public class TicketService {
             dto.setAssignedUsername(ticket.getAssignedUser().getUsername());
         }
 
+        if (ticket.getId() != null) {
+            List<FileAttachment> attachments = fileAttachmentRepository.findByTicketId(ticket.getId());
+
+            List<FileAttachmentOutputDto> fileDtos = attachments.stream().map(att -> {
+                FileAttachmentOutputDto fDto = new FileAttachmentOutputDto();
+                fDto.setId(att.getId());
+                fDto.setFileName(att.getFileName());
+                fDto.setContentType(att.getContentType());
+                return fDto;
+            }).toList();
+
+            dto.setFiles(fileDtos);
+        }
+
         return dto;
     }
 
+    // Extra bestand toevoegen aan een bestaand ticket
     public FileAttachmentOutputDto uploadFileToTicket(Integer ticketId, MultipartFile file) throws IOException {
         Ticket ticketEntity = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new RecordNotFoundException("Ticket with ID " + ticketId + " not found."));
