@@ -21,6 +21,6 @@ public class ProjectController {
     @PostMapping
     public ResponseEntity<ProjectOutputDto> createProject(@Valid @RequestBody ProjectInputDto projectInputDto) {
         ProjectOutputDto dto = projectService.createProject(projectInputDto);
-        return new ResponseEntity<>(dto, HttpStatus.CREATED);
+        return new ResponseEntity<>(dto, HttpStatus.CREATED); // Status code: 201 Created
     }
 }

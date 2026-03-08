@@ -1,6 +1,7 @@
 package nl.novi.tickettracker.controllers;
 
 import jakarta.validation.Valid;
+import nl.novi.tickettracker.dtos.AssignDeveloperDto;
 import nl.novi.tickettracker.dtos.TicketInputDto;
 import nl.novi.tickettracker.dtos.TicketOutputDto;
 import nl.novi.tickettracker.services.TicketService;
@@ -22,5 +23,14 @@ public class TicketController {
     public ResponseEntity<TicketOutputDto> createTicket(@Valid @RequestBody TicketInputDto ticketInputDto) {
         TicketOutputDto ticketOutputDto = ticketService.createTicket(ticketInputDto);
         return new ResponseEntity<>(ticketOutputDto, HttpStatus.CREATED); // Status code: 201 Created
+    }
+
+    @PutMapping("/{id}/assign")
+    public ResponseEntity<TicketOutputDto> assignDeveloperToTicket(
+            @PathVariable("id") Integer id,
+            @Valid @RequestBody AssignDeveloperDto assignDeveloperDto) {
+
+        TicketOutputDto ticketOutputDto = ticketService.assignDeveloperToTicket(id, assignDeveloperDto.getUsername());
+        return new ResponseEntity<>(ticketOutputDto, HttpStatus.OK);
     }
 }
