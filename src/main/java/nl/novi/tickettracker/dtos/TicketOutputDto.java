@@ -13,4 +13,5 @@ public class TicketOutputDto {
     public String status;
     public TicketType type;
     public Integer projectId;
+    public String assignedUsername;
 }
