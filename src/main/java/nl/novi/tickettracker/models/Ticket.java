@@ -23,8 +23,9 @@ public class Ticket {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private TicketStatus status;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)

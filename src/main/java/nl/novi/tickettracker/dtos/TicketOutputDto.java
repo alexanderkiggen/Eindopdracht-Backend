@@ -3,6 +3,7 @@ package nl.novi.tickettracker.dtos;
 import lombok.Getter;
 import lombok.Setter;
 import nl.novi.tickettracker.models.TicketType;
+import nl.novi.tickettracker.models.TicketStatus;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.List;
 
@@ -13,7 +14,7 @@ public class TicketOutputDto {
     public Integer id;
     public String title;
     public String description;
-    public String status;
+    public TicketStatus status;
     public TicketType type;
     public Integer projectId;
     public String assignedUsername;

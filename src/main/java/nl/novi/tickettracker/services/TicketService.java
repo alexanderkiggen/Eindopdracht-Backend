@@ -11,6 +11,7 @@ import nl.novi.tickettracker.models.Project;
 import nl.novi.tickettracker.models.Ticket;
 import nl.novi.tickettracker.models.User;
 import nl.novi.tickettracker.models.Comment;
+import nl.novi.tickettracker.models.TicketStatus;
 import nl.novi.tickettracker.repositories.FileAttachmentRepository;
 import nl.novi.tickettracker.repositories.ProjectRepository;
 import nl.novi.tickettracker.repositories.TicketRepository;
@@ -74,6 +75,17 @@ public class TicketService {
         return transferToDto(savedTicketEntity);
     }
 
+    // Status van een ticket updaten
+    public TicketOutputDto updateTicketStatus(Integer ticketId, TicketStatus newStatus) {
+        Ticket ticketEntity = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new RecordNotFoundException("Ticket with ID " + ticketId + " not found."));
+
+        ticketEntity.setStatus(newStatus);
+        Ticket savedTicketEntity = ticketRepository.save(ticketEntity);
+
+        return transferToDto(savedTicketEntity);
+    }
+
     private Ticket transferToTicket(TicketInputDto dto) {
         Ticket ticket = new Ticket();
         ticket.setTitle(dto.getTitle());
@@ -81,6 +93,8 @@ public class TicketService {
         ticket.setType(dto.getType());
 
         // Stap 1. Koppel het verplichte Project
+        ticket.setStatus(dto.getStatus());
+
         Project project = projectRepository.findById(dto.getProjectId())
                 .orElseThrow(() -> new RecordNotFoundException("Project with ID " + dto.getProjectId() + " not found."));
         ticket.setProject(project);

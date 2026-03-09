@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import nl.novi.tickettracker.models.TicketType;
+import nl.novi.tickettracker.models.TicketStatus;
 
 @Getter
 @Setter
@@ -20,6 +21,9 @@ public class TicketInputDto {
 
     @NotNull(message = "Ticket type is mandatory")
     public TicketType type;
+
+    @NotNull(message = "Ticket status is mandatory")
+    public TicketStatus status;
 
     @NotNull(message = "Project ID is mandatory")
     public Integer projectId;
