@@ -3,15 +3,19 @@ package nl.novi.tickettracker.services;
 import nl.novi.tickettracker.dtos.FileAttachmentOutputDto;
 import nl.novi.tickettracker.dtos.TicketInputDto;
 import nl.novi.tickettracker.dtos.TicketOutputDto;
+import nl.novi.tickettracker.dtos.CommentInputDto;
+import nl.novi.tickettracker.dtos.CommentOutputDto;
 import nl.novi.tickettracker.exceptions.RecordNotFoundException;
 import nl.novi.tickettracker.models.FileAttachment;
 import nl.novi.tickettracker.models.Project;
 import nl.novi.tickettracker.models.Ticket;
 import nl.novi.tickettracker.models.User;
+import nl.novi.tickettracker.models.Comment;
 import nl.novi.tickettracker.repositories.FileAttachmentRepository;
 import nl.novi.tickettracker.repositories.ProjectRepository;
 import nl.novi.tickettracker.repositories.TicketRepository;
 import nl.novi.tickettracker.repositories.UserRepository;
+import nl.novi.tickettracker.repositories.CommentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,12 +31,13 @@ public class TicketService {
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final FileAttachmentRepository fileAttachmentRepository;
+    private final CommentRepository commentRepository;
 
-    public TicketService(TicketRepository ticketRepository, ProjectRepository projectRepository, UserRepository userRepository, FileAttachmentRepository fileAttachmentRepository) {
-        this.ticketRepository = ticketRepository;
+    public TicketService(TicketRepository ticketRepository, ProjectRepository projectRepository, UserRepository userRepository, FileAttachmentRepository fileAttachmentRepository, CommentRepository commentRepository) {        this.ticketRepository = ticketRepository;
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
         this.fileAttachmentRepository = fileAttachmentRepository;
+        this.commentRepository = commentRepository;
     }
 
     // Nieuw Ticket aanmaken
@@ -140,5 +145,37 @@ public class TicketService {
     public FileAttachment downloadFile(Integer attachmentId) {
         return fileAttachmentRepository.findById(attachmentId)
                 .orElseThrow(() -> new RecordNotFoundException("File with ID " + attachmentId + " not found."));
+    }
+
+    // Comments
+    public CommentOutputDto addCommentToTicket(Integer ticketId, CommentInputDto dto) {
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new RecordNotFoundException("Ticket with ID " + ticketId + " not found."));
+
+        Comment comment = new Comment();
+        comment.setText(dto.getText());
+        comment.setTimestamp(java.time.LocalDateTime.now());
+        comment.setTicket(ticket);
+
+        Comment savedComment = commentRepository.save(comment);
+
+        CommentOutputDto output = new CommentOutputDto();
+        output.setId(savedComment.getId());
+        output.setText(savedComment.getText());
+        output.setTimestamp(savedComment.getTimestamp());
+
+        return output;
+    }
+
+    public List<CommentOutputDto> getCommentsForTicket(Integer ticketId) {
+        List<Comment> comments = commentRepository.findByTicketId(ticketId);
+
+        return comments.stream().map(c -> {
+            CommentOutputDto dto = new CommentOutputDto();
+            dto.setId(c.getId());
+            dto.setText(c.getText());
+            dto.setTimestamp(c.getTimestamp());
+            return dto;
+        }).toList();
     }
 }
