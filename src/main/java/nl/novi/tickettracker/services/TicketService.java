@@ -17,6 +17,7 @@ import nl.novi.tickettracker.repositories.TicketRepository;
 import nl.novi.tickettracker.repositories.UserRepository;
 import nl.novi.tickettracker.repositories.CommentRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@Transactional
 public class TicketService {
 
     private final TicketRepository ticketRepository;
@@ -33,7 +35,8 @@ public class TicketService {
     private final FileAttachmentRepository fileAttachmentRepository;
     private final CommentRepository commentRepository;
 
-    public TicketService(TicketRepository ticketRepository, ProjectRepository projectRepository, UserRepository userRepository, FileAttachmentRepository fileAttachmentRepository, CommentRepository commentRepository) {        this.ticketRepository = ticketRepository;
+    public TicketService(TicketRepository ticketRepository, ProjectRepository projectRepository, UserRepository userRepository, FileAttachmentRepository fileAttachmentRepository, CommentRepository commentRepository) {
+        this.ticketRepository = ticketRepository;
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
         this.fileAttachmentRepository = fileAttachmentRepository;
@@ -59,7 +62,6 @@ public class TicketService {
 
     // Developer toewijzen aan ticket
     public TicketOutputDto assignDeveloperToTicket(Integer ticketId, String username) {
-
         Ticket ticketEntity = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new RecordNotFoundException("Ticket with ID " + ticketId + " not found."));
 
@@ -76,8 +78,7 @@ public class TicketService {
         Ticket ticket = new Ticket();
         ticket.setTitle(dto.getTitle());
         ticket.setDescription(dto.getDescription());
-        ticket.setType(dto.getType()); // TODO: Enum gebruiken uit TicketType
-        // TODO: Status toevoegen
+        ticket.setType(dto.getType());
 
         // Stap 1. Koppel het verplichte Project
         Project project = projectRepository.findById(dto.getProjectId())
@@ -106,8 +107,8 @@ public class TicketService {
         }
 
         if (ticket.getId() != null) {
+            // Stap 1. Files ophalen
             List<FileAttachment> attachments = fileAttachmentRepository.findByTicketId(ticket.getId());
-
             List<FileAttachmentOutputDto> fileDtos = attachments.stream().map(att -> {
                 FileAttachmentOutputDto fDto = new FileAttachmentOutputDto();
                 fDto.setId(att.getId());
@@ -115,8 +116,18 @@ public class TicketService {
                 fDto.setContentType(att.getContentType());
                 return fDto;
             }).toList();
-
             dto.setFiles(fileDtos);
+
+            // Stap 2. Comments ophalen
+            List<Comment> comments = commentRepository.findByTicketId(ticket.getId());
+            List<CommentOutputDto> commentDtos = comments.stream().map(c -> {
+                CommentOutputDto cDto = new CommentOutputDto();
+                cDto.setId(c.getId());
+                cDto.setText(c.getText());
+                cDto.setTimestamp(c.getTimestamp());
+                return cDto;
+            }).toList();
+            dto.setComments(commentDtos);
         }
 
         return dto;
@@ -177,5 +188,22 @@ public class TicketService {
             dto.setTimestamp(c.getTimestamp());
             return dto;
         }).toList();
+    }
+
+    // Tickets ophalen
+    public List<TicketOutputDto> getAllTickets() {
+        List<Ticket> tickets = ticketRepository.findAll();
+        return tickets.stream().map(this::transferToDto).toList();
+    }
+
+    public TicketOutputDto getTicketById(Integer id) {
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("Ticket with ID " + id + " not found."));
+        return transferToDto(ticket);
+    }
+
+    public List<TicketOutputDto> getTicketsByProjectId(Integer projectId) {
+        List<Ticket> tickets = ticketRepository.findByProjectId(projectId);
+        return tickets.stream().map(this::transferToDto).toList();
     }
 }

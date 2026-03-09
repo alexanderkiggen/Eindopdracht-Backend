@@ -79,4 +79,19 @@ public class TicketController {
         java.util.List<nl.novi.tickettracker.dtos.CommentOutputDto> dtos = ticketService.getCommentsForTicket(ticketId);
         return ResponseEntity.ok(dtos); // Status code: 200 Ok
     }
+
+    @GetMapping
+    public ResponseEntity<java.util.List<TicketOutputDto>> getAllTickets() {
+        return ResponseEntity.ok(ticketService.getAllTickets()); // Status code: 200 Ok
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<TicketOutputDto> getTicketById(@PathVariable("id") Integer id) {
+        return ResponseEntity.ok(ticketService.getTicketById(id)); // Status code: 200 Ok
+    }
+
+    @GetMapping("/project/{projectId}")
+    public ResponseEntity<java.util.List<TicketOutputDto>> getTicketsByProject(@PathVariable("projectId") Integer projectId) {
+        return ResponseEntity.ok(ticketService.getTicketsByProjectId(projectId)); // Status code: 200 Ok
+    }
 }
