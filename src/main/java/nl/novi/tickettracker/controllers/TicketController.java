@@ -94,4 +94,13 @@ public class TicketController {
     public ResponseEntity<java.util.List<TicketOutputDto>> getTicketsByProject(@PathVariable("projectId") Integer projectId) {
         return ResponseEntity.ok(ticketService.getTicketsByProjectId(projectId)); // Status code: 200 Ok
     }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<TicketOutputDto> updateTicketStatus(
+            @PathVariable("id") Integer id,
+            @Valid @RequestBody nl.novi.tickettracker.dtos.UpdateTicketStatusDto statusDto) {
+
+        TicketOutputDto ticketOutputDto = ticketService.updateTicketStatus(id, statusDto.getStatus());
+        return new ResponseEntity<>(ticketOutputDto, HttpStatus.OK); // Status code: 200 Ok
+    }
 }
