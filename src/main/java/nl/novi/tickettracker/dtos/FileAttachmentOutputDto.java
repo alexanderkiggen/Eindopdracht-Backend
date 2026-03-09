@@ -6,6 +6,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@JsonPropertyOrder({"id", "filename", "contentType"})
+
 public class FileAttachmentOutputDto {
     private Integer id;
     private String fileName;
