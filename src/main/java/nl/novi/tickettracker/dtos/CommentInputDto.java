@@ -7,6 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CommentInputDto {
-    @NotBlank(message = "Comment can not be empty")
+    @NotBlank(message = "Comment can not be empty and require 'text'.")
     public String text;
 }
