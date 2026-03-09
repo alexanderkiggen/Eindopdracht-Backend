@@ -4,8 +4,9 @@ import jakarta.validation.Valid;
 import nl.novi.tickettracker.dtos.AssignDeveloperDto;
 import nl.novi.tickettracker.dtos.TicketInputDto;
 import nl.novi.tickettracker.dtos.TicketOutputDto;
-import nl.novi.tickettracker.services.TicketService;
 import nl.novi.tickettracker.dtos.FileAttachmentOutputDto;
+import nl.novi.tickettracker.dtos.CommentOutputDto;
+import nl.novi.tickettracker.services.TicketService;
 import nl.novi.tickettracker.models.FileAttachment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,5 +61,22 @@ public class TicketController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileAttachment.getFileName() + "\"")
                 .contentType(MediaType.parseMediaType(fileAttachment.getContentType()))
                 .body(fileAttachment.getData());
+    }
+
+    @PostMapping("/{id}/comments")
+    public ResponseEntity<CommentOutputDto> addComment(
+            @PathVariable("id") Integer ticketId,
+            @Valid @RequestBody nl.novi.tickettracker.dtos.CommentInputDto commentInputDto) {
+
+        nl.novi.tickettracker.dtos.CommentOutputDto dto = ticketService.addCommentToTicket(ticketId, commentInputDto);
+        return new ResponseEntity<>(dto, HttpStatus.CREATED); // Status code: 201 Created
+    }
+
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<java.util.List<nl.novi.tickettracker.dtos.CommentOutputDto>> getComments(
+            @PathVariable("id") Integer ticketId) {
+
+        java.util.List<nl.novi.tickettracker.dtos.CommentOutputDto> dtos = ticketService.getCommentsForTicket(ticketId);
+        return ResponseEntity.ok(dtos); // Status code: 200 Ok
     }
 }
