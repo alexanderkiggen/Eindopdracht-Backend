@@ -193,6 +193,10 @@ public class TicketService {
     }
 
     public List<CommentOutputDto> getCommentsForTicket(Integer ticketId) {
+        if (!ticketRepository.existsById(ticketId)) {
+            throw new RecordNotFoundException("Ticket with ID " + ticketId + " not found.");
+        }
+
         List<Comment> comments = commentRepository.findByTicketId(ticketId);
 
         return comments.stream().map(c -> {
@@ -217,6 +221,10 @@ public class TicketService {
     }
 
     public List<TicketOutputDto> getTicketsByProjectId(Integer projectId) {
+        if (!projectRepository.existsById(projectId)) {
+            throw new RecordNotFoundException("Project with ID " + projectId + " not found.");
+        }
+
         List<Ticket> tickets = ticketRepository.findByProjectId(projectId);
         return tickets.stream().map(this::transferToDto).toList();
     }
