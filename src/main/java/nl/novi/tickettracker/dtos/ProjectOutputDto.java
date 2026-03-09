@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@JsonPropertyOrder({"id", "name", "description", "startDate"})
 public class ProjectOutputDto {
     public Integer id;
     public String name;
