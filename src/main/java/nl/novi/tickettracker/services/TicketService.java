@@ -17,6 +17,10 @@ import nl.novi.tickettracker.repositories.ProjectRepository;
 import nl.novi.tickettracker.repositories.TicketRepository;
 import nl.novi.tickettracker.repositories.UserRepository;
 import nl.novi.tickettracker.repositories.CommentRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -25,7 +29,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
+@SuppressWarnings("ALL")
 @Service
 @Transactional
 public class TicketService {
@@ -208,10 +214,16 @@ public class TicketService {
         }).toList();
     }
 
-    // Tickets ophalen
-    public List<TicketOutputDto> getAllTickets() {
-        List<Ticket> tickets = ticketRepository.findAll();
-        return tickets.stream().map(this::transferToDto).toList();
+    // Tickets ophalen met paginering en sortering
+    public List<TicketOutputDto> getAllTickets(int page, int size, String sortField, String sortDirection) {
+        Sort.Direction direction = sortDirection.equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortField));
+
+        Page<Ticket> ticketPage = ticketRepository.findAll(pageable);
+
+        return ticketPage.stream()
+                .map(this::transferToDto)
+                .collect(Collectors.toList());
     }
 
     public TicketOutputDto getTicketById(Integer id) {

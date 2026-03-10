@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @SuppressWarnings("ALL")
 @RestController
@@ -83,8 +84,13 @@ public class TicketController {
     }
 
     @GetMapping
-    public ResponseEntity<java.util.List<TicketOutputDto>> getAllTickets() {
-        return ResponseEntity.ok(ticketService.getAllTickets()); // Status code: 200 Ok
+    public ResponseEntity<List<TicketOutputDto>> getAllTickets(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "sort", defaultValue = "id") String sortField,
+            @RequestParam(value = "dir", defaultValue = "DESC") String sortDirection
+    ) {
+        return ResponseEntity.ok(ticketService.getAllTickets(page, size, sortField, sortDirection)); // Status code: 200 Ok
     }
 
     @GetMapping("/{id}")
