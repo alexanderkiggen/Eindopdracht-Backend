@@ -1,9 +1,8 @@
 package nl.novi.tickettracker.controllers;
 
-import nl.novi.tickettracker.dtos.*;
-import nl.novi.tickettracker.models.FileAttachment;
-import nl.novi.tickettracker.models.TicketStatus;
-import nl.novi.tickettracker.services.TicketService;
+import nl.novi.tickettracker.models.*;
+import nl.novi.tickettracker.repositories.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -12,110 +11,154 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
+@Transactional
 public class TicketControllerIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private TicketRepository ticketRepository;
+    @Autowired private ProjectRepository projectRepository;
+    @Autowired private UserRepository userRepository;
+    @Autowired private FileAttachmentRepository fileAttachmentRepository;
+    @Autowired private CommentRepository commentRepository;
 
-    @MockitoBean
-    private TicketService ticketService;
+    private Integer testProjectId;
+    private Integer testTicketId;
+    private Integer testAttachmentId;
+    private final String testUsername = "johndoe";
+
+    @BeforeEach
+    void setUp() {
+        // Data voor de tests
+        Project project = new Project();
+        project.setName("Test Project");
+        project = projectRepository.save(project);
+        testProjectId = project.getId();
+
+        UserProfile profile = new UserProfile();
+        profile.setEmail("johndoe@novi-education.nl");
+        User user = new User();
+        user.setUsername(testUsername);
+        user.setPassword("0000");
+        user.setUserProfile(profile);
+        userRepository.save(user);
+
+        UserProfile profile2 = new UserProfile();
+        profile2.setEmail("janedoe@novi-education.nl");
+        profile2.setFirstname("Jane");
+        profile2.setLastname("Doe");
+        User dev = new User();
+        dev.setUsername("janedoe");
+        dev.setPassword("0000");
+        dev.setUserProfile(profile2);
+        userRepository.save(dev);
+
+        Ticket ticket = new Ticket();
+        ticket.setTitle("Test Ticket");
+        ticket.setStatus(TicketStatus.OPEN);
+        ticket.setType(TicketType.BUG);
+        ticket.setProject(project);
+        ticket.setAssignedUser(user);
+        ticket = ticketRepository.save(ticket);
+        testTicketId = ticket.getId();
+
+        FileAttachment file = new FileAttachment();
+        file.setFileName("download.pdf");
+        file.setContentType("application/pdf");
+        file.setData("Hello World".getBytes());
+        file.setTicket(ticket);
+        file = fileAttachmentRepository.save(file);
+        testAttachmentId = file.getId();
+
+        Comment comment = new Comment();
+        comment.setText("Existing comment");
+        comment.setTimestamp(LocalDateTime.now());
+        comment.setTicket(ticket);
+        commentRepository.save(comment);
+    }
 
     @Test
     public void testCreateTicket() throws Exception {
+
         // Arrange
         String ticketJson = """
                 {
-                    "title": "Bug",
+                    "title": "Nieuwe Bug",
                     "description": "Beschrijving etc...",
                     "status": "OPEN",
                     "type": "BUG",
-                    "projectId": 1,
-                    "assignedUsername": "jonhdoe"
+                    "projectId": %d,
+                    "assignedUsername": "%s"
                 }
-                """;
+                """.formatted(testProjectId, testUsername);
 
         MockMultipartFile ticketPart = new MockMultipartFile("ticket", "", "application/json", ticketJson.getBytes());
         MockMultipartFile filePart = new MockMultipartFile("file", "test.png", "image/png", "data".getBytes());
 
-        TicketOutputDto output = new TicketOutputDto();
-        output.setId(1);
-        output.setTitle("Bug");
+        // Act
+        var result = mockMvc.perform(multipart("/tickets")
+                .file(ticketPart)
+                .file(filePart));
 
-        when(ticketService.createTicket(any(), any())).thenReturn(output);
-
-        // Act & Assert
-        mockMvc.perform(multipart("/tickets")
-                        .file(ticketPart)
-                        .file(filePart))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1));
+        // Assert
+        result.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.title").value("Nieuwe Bug"));
     }
 
     @Test
     public void testAssignDeveloperToTicket() throws Exception {
+
         // Arrange
         String json = """
                 {
-                    "username": "johndoe"
+                    "username": "janedoe"
                 }
                 """;
 
-        TicketOutputDto output = new TicketOutputDto();
-        output.setAssignedUsername("johndoe");
+        // Act
+        var result = mockMvc.perform(put("/tickets/" + testTicketId + "/assign")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json));
 
-        when(ticketService.assignDeveloperToTicket(eq(1), eq("johndoe"))).thenReturn(output);
-
-        // Act & Assert
-        mockMvc.perform(put("/tickets/1/assign")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.assignedUsername").value("johndoe"));
+        // Assert
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.assignedUsername").value("janedoe"));
     }
 
     @Test
     public void testUploadFile() throws Exception {
+
         // Arrange
         MockMultipartFile filePart = new MockMultipartFile("file", "doc.pdf", "application/pdf", "data".getBytes());
-        FileAttachmentOutputDto output = new FileAttachmentOutputDto();
-        output.setFileName("doc.pdf");
 
-        when(ticketService.uploadFileToTicket(eq(1), any())).thenReturn(output);
+        // Act
+        var result = mockMvc.perform(multipart("/tickets/" + testTicketId + "/attachments").file(filePart));
 
-        // Act & Assert
-        mockMvc.perform(multipart("/tickets/1/attachments").file(filePart))
-                .andExpect(status().isCreated())
+        // Assert
+        result.andExpect(status().isCreated())
                 .andExpect(jsonPath("$.fileName").value("doc.pdf"));
     }
 
     @Test
     public void testDownloadFile() throws Exception {
-        // Arrange
-        FileAttachment attachment = new FileAttachment();
-        attachment.setFileName("doc.pdf");
-        attachment.setContentType("application/pdf");
-        attachment.setData("Hello World".getBytes());
 
-        when(ticketService.downloadFile(1)).thenReturn(attachment);
+        // Act
+        var result = mockMvc.perform(get("/tickets/attachments/" + testAttachmentId));
 
-        // Act & Assert
-        mockMvc.perform(get("/tickets/attachments/1"))
-                .andExpect(status().isOk())
-                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"doc.pdf\""))
+        // Assert
+        result.andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"download.pdf\""))
                 .andExpect(content().contentType("application/pdf"))
                 .andExpect(content().bytes("Hello World".getBytes()));
     }
@@ -125,96 +168,81 @@ public class TicketControllerIntegrationTest {
         // Arrange
         String json = """
                 {
-                    "text": "Beschrijving etc..."
+                    "text": "Dit is een integratietest comment!"
                 }
                 """;
-        CommentOutputDto output = new CommentOutputDto();
-        output.setText("Beschrijving etc...");
 
-        when(ticketService.addCommentToTicket(eq(1), any(nl.novi.tickettracker.dtos.CommentInputDto.class))).thenReturn(output);
+        // Act
+        var result = mockMvc.perform(post("/tickets/" + testTicketId + "/comments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json));
 
-        // Act & Assert
-        mockMvc.perform(post("/tickets/1/comments")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.text").value("Beschrijving etc..."));
+        // Assert
+        result.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.text").value("Dit is een integratietest comment!"));
     }
 
     @Test
     public void testGetComments() throws Exception {
-        // Arrange
-        CommentOutputDto output = new CommentOutputDto();
-        output.setText("Beschrijving etc...");
 
-        when(ticketService.getCommentsForTicket(1)).thenReturn(List.of(output));
+        // Act
+        var result = mockMvc.perform(get("/tickets/" + testTicketId + "/comments"));
 
-        // Act & Assert
-        mockMvc.perform(get("/tickets/1/comments"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].text").value("Beschrijving etc..."));
+        // Assert
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].text").value("Existing comment"));
     }
 
     @Test
     public void testGetAllTickets() throws Exception {
-        // Arrange
-        TicketOutputDto output = new TicketOutputDto();
-        output.setId(10);
 
-        when(ticketService.getAllTickets(0, 10, "id", "DESC")).thenReturn(List.of(output));
+        // Act
+        var result = mockMvc.perform(get("/tickets?page=0&size=10&sort=id&dir=DESC"));
 
-        // Act & Assert
-        mockMvc.perform(get("/tickets?page=0&size=10&sort=id&dir=DESC"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(10));
+        // Assert
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").exists());
     }
 
     @Test
     public void testGetTicketById() throws Exception {
-        // Arrange
-        TicketOutputDto output = new TicketOutputDto();
-        output.setId(5);
 
-        when(ticketService.getTicketById(5)).thenReturn(output);
+        // Act
+        var result = mockMvc.perform(get("/tickets/" + testTicketId));
 
-        // Act & Assert
-        mockMvc.perform(get("/tickets/5"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(5));
+        // Assert
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(testTicketId));
     }
 
     @Test
     public void testGetTicketsByProject() throws Exception {
-        // Arrange
-        TicketOutputDto output = new TicketOutputDto();
-        output.setId(1);
 
-        when(ticketService.getTicketsByProjectId(99)).thenReturn(List.of(output));
+        // Act
+        var result = mockMvc.perform(get("/tickets/project/" + testProjectId));
 
-        // Act & Assert
-        mockMvc.perform(get("/tickets/project/99"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1));
+        // Assert
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].projectId").value(testProjectId));
     }
 
     @Test
     public void testUpdateTicketStatus() throws Exception {
+
         // Arrange
         String json = """
                 {
                     "status": "CLOSED"
                 }
                 """;
-        TicketOutputDto output = new TicketOutputDto();
-        output.setStatus(TicketStatus.CLOSED);
 
-        when(ticketService.updateTicketStatus(eq(1), eq(TicketStatus.CLOSED))).thenReturn(output);
+        // Act
+        var result = mockMvc.perform(put("/tickets/" + testTicketId + "/status")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json));
 
-        // Act & Assert
-        mockMvc.perform(put("/tickets/1/status")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isOk())
+        // Assert
+        result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("CLOSED"));
     }
 }
