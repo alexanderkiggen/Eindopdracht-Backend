@@ -33,16 +33,15 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Specifieke acties die alleen de Projectmanager mag doen
                         .requestMatchers(HttpMethod.POST, "/projects").hasRole("PROJECTMANAGER")
                         .requestMatchers(HttpMethod.PUT, "/projects/**").hasRole("PROJECTMANAGER")
 
                         .requestMatchers(HttpMethod.PUT, "/tickets/{id}/assign").hasRole("PROJECTMANAGER")
                         .requestMatchers(HttpMethod.PUT, "/tickets/{id}/project").hasRole("PROJECTMANAGER")
 
-                        .requestMatchers(HttpMethod.DELETE, "/tickets/attachments/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/tickets/comments/**").authenticated()
-
-                        .anyRequest().authenticated()
+                        // Overige acties vereisen de rollen developer of projectmanager
+                        .anyRequest().hasAnyRole("DEVELOPER", "PROJECTMANAGER")
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
