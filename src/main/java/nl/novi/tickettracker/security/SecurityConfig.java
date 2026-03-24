@@ -77,7 +77,7 @@ public class SecurityConfig {
             List<String> roles = (List<String>) rolesList;
 
             return roles.stream()
-                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()))
+                    .map(role -> new SimpleGrantedAuthority(role.toUpperCase()))
                     .collect(Collectors.toList());
         });
 

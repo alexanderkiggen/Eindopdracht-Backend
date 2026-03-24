@@ -61,9 +61,9 @@ public class TicketService {
             String loggedInUsername = jwt.getClaimAsString("preferred_username");
 
             boolean isDeveloper = auth.getAuthorities().stream()
-                    .anyMatch(a -> a.getAuthority().equals("DEVELOPER"));
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_DEVELOPER"));
             boolean isProjectManager = auth.getAuthorities().stream()
-                    .anyMatch(a -> a.getAuthority().equals("PROJECTMANAGER"));
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_PROJECTMANAGER"));
 
             if (isDeveloper && !isProjectManager) {
                 if (ticket.getAssignedUser() == null || !ticket.getAssignedUser().getUsername().equals(loggedInUsername)) {
