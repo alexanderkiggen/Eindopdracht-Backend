@@ -15,9 +15,6 @@ public class UserInputDto {
     @NotBlank(message = "Username is mandatory")
     public String username;
 
-    @NotBlank(message = "Password is mandatory")
-    public String password;
-
     @NotBlank(message = "First name is mandatory")
     public String firstname;
 

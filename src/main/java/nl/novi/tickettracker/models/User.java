@@ -20,9 +20,6 @@ public class User {
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
-    @Column(name = "password", nullable = false)
-    private String password;
-
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_profile_id", referencedColumnName = "id")
     private UserProfile userProfile;
