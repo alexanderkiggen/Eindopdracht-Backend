@@ -2,16 +2,13 @@ package nl.novi.tickettracker.controllers;
 
 import jakarta.validation.Valid;
 import nl.novi.tickettracker.dtos.UpdateUserProfileDto;
-import nl.novi.tickettracker.dtos.UserInputDto;
 import nl.novi.tickettracker.dtos.UserOutputDto;
 import nl.novi.tickettracker.services.UserService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@SuppressWarnings("ALL")
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -22,22 +19,19 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
-    public ResponseEntity<UserOutputDto> createUser(@Valid @RequestBody UserInputDto dto) {
-        UserOutputDto createdUser = userService.createUser(dto);
-        return new ResponseEntity<>(createdUser, HttpStatus.CREATED); // Status code: 201 Created
-    }
-
+    // Postman Request: [User] Get All Users
     @GetMapping
     public ResponseEntity<List<UserOutputDto>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers()); // Status code: 200 Ok
     }
 
+    // Postman Request: [User] Get User By Username
     @GetMapping("/{username}")
     public ResponseEntity<UserOutputDto> getUserByUsername(@PathVariable("username") String username) {
         return ResponseEntity.ok(userService.getUserByUsername(username)); // Status code: 200 Ok
     }
 
+    // Postman Request: [User] Update User Profile
     @PutMapping("/{username}/profile")
     public ResponseEntity<UserOutputDto> updateUserProfile(
             @PathVariable("username") String username,
