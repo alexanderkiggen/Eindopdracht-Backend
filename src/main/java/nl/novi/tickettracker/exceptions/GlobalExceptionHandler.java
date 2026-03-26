@@ -16,7 +16,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("ALL")
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -46,7 +45,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpServletRequest request) {
         String message = "Malformed JSON request. Please check your request body.";
 
-        if (ex.getMostSpecificCause() != null && ex.getMostSpecificCause().getMessage() != null) {
+        ex.getMostSpecificCause();
+        if (ex.getMostSpecificCause().getMessage() != null) {
             String specificMessage = ex.getMostSpecificCause().getMessage();
 
             // Controleer Enum fouten
@@ -58,7 +58,7 @@ public class GlobalExceptionHandler {
                 int startIndex = specificMessage.indexOf("[");
                 int endIndex = specificMessage.indexOf("]") + 1;
 
-                if (startIndex != -1 && endIndex != -1) {
+                if (startIndex != -1) {
                     String acceptedValues = specificMessage.substring(startIndex, endIndex);
                     message = "Invalid Enum value provided for " + fieldName + ". Accepted values are: " + acceptedValues;
                 }
@@ -110,11 +110,31 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleDataIntegrityViolationException(org.springframework.dao.DataIntegrityViolationException ex, HttpServletRequest request) {
         String message = "A record with this unique value already exists.";
 
-        if (ex.getMostSpecificCause() != null && ex.getMostSpecificCause().getMessage().contains("duplicate key value")) {
+        ex.getMostSpecificCause();
+        if (ex.getMostSpecificCause().getMessage().contains("duplicate key value")) {
             message = "The provided username or email is already in use. Please choose another one.";
         }
 
         Map<String, Object> body = createStandardErrorBody(HttpStatus.CONFLICT, message, request.getRequestURI());
         return new ResponseEntity<>(body, HttpStatus.CONFLICT); // Status code: 409 Conflict
+    }
+
+    // Validatiefouten @ModelAttribute
+    @ExceptionHandler(org.springframework.validation.BindException.class)
+    public ResponseEntity<Map<String, Object>> handleBindExceptions(org.springframework.validation.BindException ex, HttpServletRequest request) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.joining("; "));
+
+        Map<String, Object> body = createStandardErrorBody(HttpStatus.BAD_REQUEST, message, request.getRequestURI());
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    // Vangt fout af als @RequestParam("file") ontbreekt
+    @ExceptionHandler(org.springframework.web.multipart.support.MissingServletRequestPartException.class)
+    public ResponseEntity<Map<String, Object>> handleMissingParts(org.springframework.web.multipart.support.MissingServletRequestPartException ex, HttpServletRequest request) {
+        String message = "Missing required file/part: " + ex.getRequestPartName();
+        Map<String, Object> body = createStandardErrorBody(HttpStatus.BAD_REQUEST, message, request.getRequestURI());
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 }

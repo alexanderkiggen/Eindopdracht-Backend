@@ -9,11 +9,13 @@ import nl.novi.tickettracker.models.UserProfile;
 import nl.novi.tickettracker.repositories.UserProfileRepository;
 import nl.novi.tickettracker.repositories.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class UserService {
 
     private final UserRepository userRepository;
@@ -22,6 +24,21 @@ public class UserService {
     public UserService(UserRepository userRepository, UserProfileRepository userProfileRepository) {
         this.userRepository = userRepository;
         this.userProfileRepository = userProfileRepository;
+    }
+
+    public void provisionUserIfNeeded(String username, String email) {
+        if (userRepository.findByUsername(username).isEmpty()) {
+            UserProfile profile = new UserProfile();
+            profile.setEmail(email);
+            UserProfile savedProfile = userProfileRepository.save(profile);
+
+            User user = new User();
+            user.setUsername(username);
+            user.setUserProfile(savedProfile);
+            userRepository.save(user);
+
+            System.out.println("New keycloak user added to database: " + username);
+        }
     }
 
     public UserOutputDto createUser(UserInputDto dto) {
@@ -37,7 +54,6 @@ public class UserService {
 
         User user = new User();
         user.setUsername(dto.getUsername());
-        user.setPassword(dto.getPassword());
         user.setUserProfile(savedProfile);
 
         User savedUser = userRepository.save(user);
