@@ -4,6 +4,7 @@ import nl.novi.tickettracker.dtos.*;
 import nl.novi.tickettracker.exceptions.RecordNotFoundException;
 import nl.novi.tickettracker.models.*;
 import nl.novi.tickettracker.repositories.*;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,7 +12,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -19,8 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class TicketServiceTest {
@@ -43,8 +48,24 @@ public class TicketServiceTest {
     @InjectMocks
     private TicketService ticketService;
 
+    @AfterEach
+    public void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
+
+    private void mockSecurityContext(String username, String role) {
+        Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "none")
+                .claim("preferred_username", username)
+                .build();
+        org.springframework.security.core.Authentication auth =
+                new JwtAuthenticationToken(jwt, List.of(new SimpleGrantedAuthority(role)));
+        SecurityContextHolder.getContext().setAuthentication(auth);
+    }
+
     @Test
     public void testGetTicketById_Success() {
+
         // Arrange
         Project project = new Project();
         project.setId(1);
@@ -90,6 +111,7 @@ public class TicketServiceTest {
 
     @Test
     public void testGetTicketById_ThrowsRecordNotFoundException() {
+
         // Arrange
         when(ticketRepository.findById(999)).thenReturn(Optional.empty());
 
@@ -102,6 +124,7 @@ public class TicketServiceTest {
 
     @Test
     public void testCreateTicket_Success() throws IOException {
+
         // Arrange
         TicketInputDto dto = new TicketInputDto();
         dto.setTitle("Nieuwe Bug");
@@ -139,6 +162,7 @@ public class TicketServiceTest {
 
     @Test
     public void testCreateTicket_ProjectNotFound() {
+
         // Arrange
         TicketInputDto dto = new TicketInputDto();
         dto.setProjectId(99);
@@ -152,6 +176,7 @@ public class TicketServiceTest {
 
     @Test
     public void testCreateTicket_UserNotFound() {
+
         // Arrange
         TicketInputDto dto = new TicketInputDto();
         dto.setProjectId(1);
@@ -170,6 +195,7 @@ public class TicketServiceTest {
 
     @Test
     public void testAssignDeveloperToTicket_Success() {
+
         // Arrange
         Ticket ticket = new Ticket();
         ticket.setId(10);
@@ -193,6 +219,7 @@ public class TicketServiceTest {
 
     @Test
     public void testAssignDeveloperToTicket_TicketNotFound() {
+
         // Arrange
         when(ticketRepository.findById(99)).thenReturn(Optional.empty());
 
@@ -202,6 +229,7 @@ public class TicketServiceTest {
 
     @Test
     public void testAssignDeveloperToTicket_UserNotFound() {
+
         // Arrange
         Ticket ticket = new Ticket();
         when(ticketRepository.findById(10)).thenReturn(Optional.of(ticket));
@@ -213,6 +241,7 @@ public class TicketServiceTest {
 
     @Test
     public void testUpdateTicketStatus_Success() {
+
         // Arrange
         Ticket ticket = new Ticket();
         ticket.setId(1);
@@ -240,7 +269,192 @@ public class TicketServiceTest {
     }
 
     @Test
+    public void testUpdateTicketStatus_ForbiddenIfNotAssignedDeveloper() {
+
+        // Arrange
+        mockSecurityContext("hacker", "ROLE_DEVELOPER");
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+        User assignedUser = new User();
+        assignedUser.setUsername("johndoe");
+        ticket.setAssignedUser(assignedUser);
+
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+
+        // Act & Assert
+        assertThrows(ResponseStatusException.class, () -> ticketService.updateTicketStatus(1, TicketStatus.CLOSED));
+    }
+
+    @Test
+    public void testUpdateTicketStatus_ForbiddenIfNoAssignedDeveloper() {
+
+        // Arrange
+        mockSecurityContext("hacker", "ROLE_DEVELOPER");
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+        ticket.setAssignedUser(null); // Geen assigned user
+
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+
+        // Act & Assert
+        assertThrows(ResponseStatusException.class, () -> ticketService.updateTicketStatus(1, TicketStatus.CLOSED));
+    }
+
+    @Test
+    public void testUpdateTicketStatus_AllowedForProjectManager() {
+
+        // Arrange
+        mockSecurityContext("manager", "ROLE_PROJECTMANAGER");
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+        User assignedUser = new User();
+        assignedUser.setUsername("johndoe");
+        ticket.setAssignedUser(assignedUser);
+        Project project = new Project();
+        project.setId(1);
+        ticket.setProject(project);
+
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+        when(ticketRepository.save(any(Ticket.class))).thenReturn(ticket);
+
+        // Act
+        TicketOutputDto result = ticketService.updateTicketStatus(1, TicketStatus.IN_PROGRESS);
+
+        // Assert
+        assertNotNull(result);
+    }
+
+    @Test
+    public void testUpdateTicketStatus_AllowedIfAssignedDeveloper() {
+
+        // Arrange
+        mockSecurityContext("johndoe", "ROLE_DEVELOPER");
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+        User assignedUser = new User();
+        assignedUser.setUsername("johndoe");
+        ticket.setAssignedUser(assignedUser);
+        Project project = new Project();
+        project.setId(1);
+        ticket.setProject(project);
+
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+        when(ticketRepository.save(any(Ticket.class))).thenReturn(ticket);
+
+        // Act
+        TicketOutputDto result = ticketService.updateTicketStatus(1, TicketStatus.IN_PROGRESS);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(TicketStatus.IN_PROGRESS, result.getStatus());
+    }
+
+    @Test
+    public void testUpdateTicketStatus_AllowedIfAuthNotJwt() {
+
+        // Arrange
+        org.springframework.security.core.Authentication auth =
+                new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                        "nonJwtUser", "password", List.of(new SimpleGrantedAuthority("ROLE_DEVELOPER")));
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+        ticket.setAssignedUser(null);
+        Project project = new Project();
+        project.setId(1);
+        ticket.setProject(project);
+
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+        when(ticketRepository.save(any(Ticket.class))).thenReturn(ticket);
+
+        // Act
+        TicketOutputDto result = ticketService.updateTicketStatus(1, TicketStatus.IN_PROGRESS);
+
+        // Assert
+        assertNotNull(result);
+    }
+
+    @Test
+    public void testUpdateTicketStatus_AllowedForUserWithBothRoles() {
+
+        // Arrange
+        Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "none")
+                .claim("preferred_username", "managerdev")
+                .build();
+        org.springframework.security.core.Authentication auth =
+                new JwtAuthenticationToken(jwt, List.of(
+                        new SimpleGrantedAuthority("ROLE_DEVELOPER"),
+                        new SimpleGrantedAuthority("ROLE_PROJECTMANAGER")));
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+        User assignedUser = new User();
+        assignedUser.setUsername("johndoe");
+        ticket.setAssignedUser(assignedUser);
+        Project project = new Project();
+        project.setId(1);
+        ticket.setProject(project);
+
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+        when(ticketRepository.save(any(Ticket.class))).thenReturn(ticket);
+
+        // Act
+        TicketOutputDto result = ticketService.updateTicketStatus(1, TicketStatus.IN_PROGRESS);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(TicketStatus.IN_PROGRESS, result.getStatus());
+    }
+
+    @Test
+    public void testChangeTicketProject_Success() {
+
+        // Arrange
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+        Project project = new Project();
+        project.setId(2);
+
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+        when(projectRepository.findById(2)).thenReturn(Optional.of(project));
+        when(ticketRepository.save(any(Ticket.class))).thenReturn(ticket);
+
+        // Act
+        TicketOutputDto result = ticketService.changeTicketProject(1, 2);
+
+        // Assert
+        assertEquals(2, result.getProjectId());
+    }
+
+    @Test
+    public void testChangeTicketProject_TicketNotFound() {
+
+        // Arrange
+        when(ticketRepository.findById(1)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(RecordNotFoundException.class, () -> ticketService.changeTicketProject(1, 2));
+    }
+
+    @Test
+    public void testChangeTicketProject_ProjectNotFound() {
+
+        // Arrange
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+        when(projectRepository.findById(2)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(RecordNotFoundException.class, () -> ticketService.changeTicketProject(1, 2));
+    }
+
+    @Test
     public void testGetAllTickets_PagedAndSorted_Descending() {
+
         // Arrange
         Project project = new Project();
         project.setId(1);
@@ -262,6 +476,7 @@ public class TicketServiceTest {
 
     @Test
     public void testGetAllTickets_PagedAndSorted_Ascending() {
+
         // Arrange
         Project project = new Project();
         project.setId(1);
@@ -283,6 +498,7 @@ public class TicketServiceTest {
 
     @Test
     public void testGetTicketsByProjectId_Success() {
+
         // Arrange
         Project project = new Project();
         project.setId(1);
@@ -302,6 +518,7 @@ public class TicketServiceTest {
 
     @Test
     public void testGetTicketsByProjectId_NotFound() {
+
         // Arrange
         when(projectRepository.existsById(1)).thenReturn(false);
 
@@ -311,6 +528,7 @@ public class TicketServiceTest {
 
     @Test
     public void testTransferToDto_TicketWithoutId() {
+
         // Arrange
         Project project = new Project();
         project.setId(1);
@@ -332,6 +550,7 @@ public class TicketServiceTest {
 
     @Test
     public void testUploadFileToTicket_Success() throws IOException {
+
         // Arrange
         Ticket ticket = new Ticket();
         ticket.setId(1);
@@ -356,6 +575,7 @@ public class TicketServiceTest {
 
     @Test
     public void testUploadFileToTicket_NotFound() {
+
         // Arrange
         MultipartFile mockFile = new MockMultipartFile("file", "test.txt", "text/plain", "Data".getBytes());
         when(ticketRepository.findById(1)).thenReturn(Optional.empty());
@@ -366,6 +586,7 @@ public class TicketServiceTest {
 
     @Test
     public void testDownloadFile_Success() {
+
         // Arrange
         FileAttachment attachment = new FileAttachment();
         attachment.setId(1);
@@ -380,6 +601,7 @@ public class TicketServiceTest {
 
     @Test
     public void testDownloadFile_NotFound() {
+
         // Arrange
         when(fileAttachmentRepository.findById(1)).thenReturn(Optional.empty());
 
@@ -388,7 +610,31 @@ public class TicketServiceTest {
     }
 
     @Test
+    public void testDeleteAttachment_Success() {
+
+        // Arrange
+        when(fileAttachmentRepository.existsById(1)).thenReturn(true);
+
+        // Act
+        ticketService.deleteAttachment(1);
+
+        // Assert
+        verify(fileAttachmentRepository, times(1)).deleteById(1);
+    }
+
+    @Test
+    public void testDeleteAttachment_NotFound() {
+
+        // Arrange
+        when(fileAttachmentRepository.existsById(1)).thenReturn(false);
+
+        // Act & Assert
+        assertThrows(RecordNotFoundException.class, () -> ticketService.deleteAttachment(1));
+    }
+
+    @Test
     public void testAddCommentToTicket_Success() {
+
         // Arrange
         Ticket ticket = new Ticket();
         ticket.setId(1);
@@ -414,6 +660,7 @@ public class TicketServiceTest {
 
     @Test
     public void testAddCommentToTicket_NotFound() {
+
         // Arrange
         CommentInputDto dto = new CommentInputDto();
         when(ticketRepository.findById(1)).thenReturn(Optional.empty());
@@ -424,6 +671,7 @@ public class TicketServiceTest {
 
     @Test
     public void testGetCommentsForTicket_Success() {
+
         // Arrange
         Comment comment = new Comment();
         comment.setId(1);
@@ -442,10 +690,34 @@ public class TicketServiceTest {
 
     @Test
     public void testGetCommentsForTicket_NotFound() {
+
         // Arrange
         when(ticketRepository.existsById(1)).thenReturn(false);
 
         // Act & Assert
         assertThrows(RecordNotFoundException.class, () -> ticketService.getCommentsForTicket(1));
+    }
+
+    @Test
+    public void testDeleteComment_Success() {
+
+        // Arrange
+        when(commentRepository.existsById(1)).thenReturn(true);
+
+        // Act
+        ticketService.deleteComment(1);
+
+        // Assert
+        verify(commentRepository, times(1)).deleteById(1);
+    }
+
+    @Test
+    public void testDeleteComment_NotFound() {
+
+        // Arrange
+        when(commentRepository.existsById(1)).thenReturn(false);
+
+        // Act & Assert
+        assertThrows(RecordNotFoundException.class, () -> ticketService.deleteComment(1));
     }
 }
