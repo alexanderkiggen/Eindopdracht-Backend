@@ -175,17 +175,6 @@ public class TicketControllerIntegrationTest {
     }
 
     @Test
-    public void testDeleteAttachment() throws Exception {
-
-        // Act
-        var result = mockMvc.perform(delete("/tickets/attachments/" + testAttachmentId));
-
-        // Assert
-        result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").exists());
-    }
-
-    @Test
     public void testAddComment() throws Exception {
 
         // Arrange
@@ -214,24 +203,6 @@ public class TicketControllerIntegrationTest {
         // Assert
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].text").value("Bestaande opmerking"));
-    }
-
-    @Test
-    public void testDeleteComment() throws Exception {
-
-        // Arrange
-        Comment comment = new Comment();
-        comment.setText("Tijdelijke comment");
-        comment.setTimestamp(LocalDateTime.now());
-        comment.setTicket(ticketRepository.findById(testTicketId).orElseThrow());
-        comment = commentRepository.save(comment);
-
-        // Act
-        var result = mockMvc.perform(delete("/tickets/comments/" + comment.getId()));
-
-        // Assert
-        result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").exists());
     }
 
     @Test

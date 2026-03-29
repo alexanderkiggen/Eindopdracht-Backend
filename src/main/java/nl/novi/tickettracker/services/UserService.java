@@ -1,7 +1,6 @@
 package nl.novi.tickettracker.services;
 
 import nl.novi.tickettracker.dtos.UpdateUserProfileDto;
-import nl.novi.tickettracker.dtos.UserInputDto;
 import nl.novi.tickettracker.dtos.UserOutputDto;
 import nl.novi.tickettracker.exceptions.RecordNotFoundException;
 import nl.novi.tickettracker.models.User;
@@ -39,26 +38,6 @@ public class UserService {
 
             System.out.println("New keycloak user added to database: " + username);
         }
-    }
-
-    public UserOutputDto createUser(UserInputDto dto) {
-        UserProfile profile = new UserProfile();
-        profile.setFirstname(dto.getFirstname());
-        profile.setLastname(dto.getLastname());
-        profile.setBio(dto.getBio());
-        profile.setEmail(dto.getEmail());
-        profile.setPhone(dto.getPhone());
-        profile.setBirthdate(dto.getBirthdate());
-
-        UserProfile savedProfile = userProfileRepository.save(profile);
-
-        User user = new User();
-        user.setUsername(dto.getUsername());
-        user.setUserProfile(savedProfile);
-
-        User savedUser = userRepository.save(user);
-
-        return transferToDto(savedUser);
     }
 
     public List<UserOutputDto> getAllUsers() {

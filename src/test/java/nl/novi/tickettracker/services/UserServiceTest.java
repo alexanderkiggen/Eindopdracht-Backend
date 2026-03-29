@@ -1,7 +1,6 @@
 package nl.novi.tickettracker.services;
 
 import nl.novi.tickettracker.dtos.UpdateUserProfileDto;
-import nl.novi.tickettracker.dtos.UserInputDto;
 import nl.novi.tickettracker.dtos.UserOutputDto;
 import nl.novi.tickettracker.exceptions.RecordNotFoundException;
 import nl.novi.tickettracker.models.User;
@@ -61,44 +60,6 @@ public class UserServiceTest {
         userService.provisionUserIfNeeded("newuser", "new@email.nl");
 
         // Assert
-        verify(userProfileRepository, times(1)).save(any(UserProfile.class));
-        verify(userRepository, times(1)).save(any(User.class));
-    }
-
-    @Test
-    public void testCreateUser_Success() {
-
-        // Arrange
-        UserInputDto inputDto = new UserInputDto();
-        inputDto.setUsername("johndoe");
-        inputDto.setFirstname("John");
-        inputDto.setLastname("Doe");
-        inputDto.setBio("Bio etc...");
-        inputDto.setEmail("johndoe@novi-education.nl");
-        inputDto.setPhone("0612345678");
-        inputDto.setBirthdate(LocalDateTime.now());
-
-        UserProfile savedProfile = new UserProfile();
-        savedProfile.setId(1);
-        savedProfile.setFirstname("John");
-        savedProfile.setEmail("johndoe@novi-education.nl");
-
-        User savedUser = new User();
-        savedUser.setId(10);
-        savedUser.setUsername("johndoe");
-        savedUser.setUserProfile(savedProfile);
-
-        when(userProfileRepository.save(any(UserProfile.class))).thenReturn(savedProfile);
-        when(userRepository.save(any(User.class))).thenReturn(savedUser);
-
-        // Act
-        UserOutputDto result = userService.createUser(inputDto);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(10, result.getId());
-        assertEquals("johndoe", result.getUsername());
-        assertEquals("John", result.getFirstname());
         verify(userProfileRepository, times(1)).save(any(UserProfile.class));
         verify(userRepository, times(1)).save(any(User.class));
     }

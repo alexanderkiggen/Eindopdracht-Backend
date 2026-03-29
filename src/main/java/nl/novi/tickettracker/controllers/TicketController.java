@@ -103,19 +103,6 @@ public class TicketController {
                 .body(fileAttachment.getData()); // Status code: 200 Ok
     }
 
-    // Postman Request: [Attachment] Delete File
-    @DeleteMapping("/attachments/{attachmentId}")
-    public ResponseEntity<Map<String, Object>> deleteAttachment(@PathVariable("attachmentId") Integer attachmentId) {
-        ticketService.deleteAttachment(attachmentId);
-
-        Map<String, Object> response = new java.util.LinkedHashMap<>();
-        response.put("timestamp", java.time.Instant.now().toString());
-        response.put("status", HttpStatus.OK.value());
-        response.put("message", "Attachment with ID " + attachmentId + " has been successfully deleted.");
-
-        return ResponseEntity.ok(response); // Status code: 200 Ok
-    }
-
     // Postman Request: [Comment] Add Comment
     @PostMapping("/{id}/comments")
     public ResponseEntity<CommentOutputDto> addComment(
@@ -131,19 +118,6 @@ public class TicketController {
     public ResponseEntity<List<CommentOutputDto>> getComments(@PathVariable("id") Integer ticketId) {
         List<CommentOutputDto> dtos = ticketService.getCommentsForTicket(ticketId);
         return ResponseEntity.ok(dtos); // Status code: 200 Ok
-    }
-
-    // Postman Request: [Comment] Delete Comment
-    @DeleteMapping("/comments/{commentId}")
-    public ResponseEntity<Map<String, Object>> deleteComment(@PathVariable("commentId") Integer commentId) {
-        ticketService.deleteComment(commentId);
-
-        Map<String, Object> response = new java.util.LinkedHashMap<>();
-        response.put("timestamp", java.time.Instant.now().toString());
-        response.put("status", HttpStatus.OK.value());
-        response.put("message", "Comment with ID " + commentId + " has been successfully deleted.");
-
-        return ResponseEntity.ok(response); // Status code: 200 Ok
     }
 
     // Postman Request: [Ticket] Get Tickets By Project

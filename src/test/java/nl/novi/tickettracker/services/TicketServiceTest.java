@@ -610,29 +610,6 @@ public class TicketServiceTest {
     }
 
     @Test
-    public void testDeleteAttachment_Success() {
-
-        // Arrange
-        when(fileAttachmentRepository.existsById(1)).thenReturn(true);
-
-        // Act
-        ticketService.deleteAttachment(1);
-
-        // Assert
-        verify(fileAttachmentRepository, times(1)).deleteById(1);
-    }
-
-    @Test
-    public void testDeleteAttachment_NotFound() {
-
-        // Arrange
-        when(fileAttachmentRepository.existsById(1)).thenReturn(false);
-
-        // Act & Assert
-        assertThrows(RecordNotFoundException.class, () -> ticketService.deleteAttachment(1));
-    }
-
-    @Test
     public void testAddCommentToTicket_Success() {
 
         // Arrange
@@ -696,28 +673,5 @@ public class TicketServiceTest {
 
         // Act & Assert
         assertThrows(RecordNotFoundException.class, () -> ticketService.getCommentsForTicket(1));
-    }
-
-    @Test
-    public void testDeleteComment_Success() {
-
-        // Arrange
-        when(commentRepository.existsById(1)).thenReturn(true);
-
-        // Act
-        ticketService.deleteComment(1);
-
-        // Assert
-        verify(commentRepository, times(1)).deleteById(1);
-    }
-
-    @Test
-    public void testDeleteComment_NotFound() {
-
-        // Arrange
-        when(commentRepository.existsById(1)).thenReturn(false);
-
-        // Act & Assert
-        assertThrows(RecordNotFoundException.class, () -> ticketService.deleteComment(1));
     }
 }

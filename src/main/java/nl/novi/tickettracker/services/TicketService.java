@@ -150,12 +150,6 @@ public class TicketService {
                 .orElseThrow(() -> new RecordNotFoundException("File with ID " + attachmentId + " not found."));
     }
 
-    public void deleteAttachment(Integer attachmentId) {
-        if (!fileAttachmentRepository.existsById(attachmentId)) {
-            throw new RecordNotFoundException("File with ID " + attachmentId + " not found.");
-        }
-        fileAttachmentRepository.deleteById(attachmentId);
-    }
 
     public CommentOutputDto addCommentToTicket(Integer ticketId, CommentInputDto dto) {
         Ticket ticket = ticketRepository.findById(ticketId)
@@ -192,13 +186,6 @@ public class TicketService {
             dto.setTimestamp(c.getTimestamp());
             return dto;
         }).toList();
-    }
-
-    public void deleteComment(Integer commentId) {
-        if (!commentRepository.existsById(commentId)) {
-            throw new RecordNotFoundException("Comment with ID " + commentId + " not found.");
-        }
-        commentRepository.deleteById(commentId);
     }
 
     public List<TicketOutputDto> getAllTickets(int page, int size, String sortField, String sortDirection) {
