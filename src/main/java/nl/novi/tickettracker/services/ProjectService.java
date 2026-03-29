@@ -4,7 +4,11 @@ import nl.novi.tickettracker.dtos.ProjectInputDto;
 import nl.novi.tickettracker.dtos.ProjectOutputDto;
 import nl.novi.tickettracker.models.Project;
 import nl.novi.tickettracker.repositories.ProjectRepository;
+import nl.novi.tickettracker.exceptions.RecordNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjectService {
@@ -30,6 +34,33 @@ public class ProjectService {
         Project savedProject = projectRepository.save(project);
 
         return transferToDto(savedProject);
+    }
+
+    public List<ProjectOutputDto> getAllProjects() {
+        return projectRepository.findAll().stream()
+                .map(this::transferToDto)
+                .collect(Collectors.toList());
+    }
+
+    public ProjectOutputDto getProjectById(Integer id) {
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("Project with ID " + id + " not found."));
+        return transferToDto(project);
+    }
+
+    public ProjectOutputDto updateProject(Integer id, ProjectInputDto dto) {
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("Project with ID " + id + " not found."));
+
+        project.setName(dto.getName());
+        project.setDescription(dto.getDescription());
+
+        if (dto.getStartDate() != null) {
+            project.setStartDate(dto.getStartDate());
+        }
+
+        Project updatedProject = projectRepository.save(project);
+        return transferToDto(updatedProject);
     }
 
     private ProjectOutputDto transferToDto(Project project) {

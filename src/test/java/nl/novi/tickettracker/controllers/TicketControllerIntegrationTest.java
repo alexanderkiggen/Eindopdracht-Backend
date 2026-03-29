@@ -3,6 +3,7 @@ package nl.novi.tickettracker.controllers;
 import nl.novi.tickettracker.models.*;
 import nl.novi.tickettracker.repositories.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -13,8 +14,13 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -39,6 +45,15 @@ public class TicketControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        // Keycloack mock
+        Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "none")
+                .claim("preferred_username", testUsername)
+                .build();
+        org.springframework.security.core.Authentication auth =
+                new JwtAuthenticationToken(jwt, List.of(new SimpleGrantedAuthority("ROLE_DEVELOPER")));
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
         // Data voor de tests
         Project project = new Project();
         project.setName("Test Project");
@@ -49,7 +64,6 @@ public class TicketControllerIntegrationTest {
         profile.setEmail("johndoe@novi-education.nl");
         User user = new User();
         user.setUsername(testUsername);
-        user.setPassword("0000");
         user.setUserProfile(profile);
         userRepository.save(user);
 
@@ -59,7 +73,6 @@ public class TicketControllerIntegrationTest {
         profile2.setLastname("Doe");
         User dev = new User();
         dev.setUsername("janedoe");
-        dev.setPassword("0000");
         dev.setUserProfile(profile2);
         userRepository.save(dev);
 
@@ -81,34 +94,32 @@ public class TicketControllerIntegrationTest {
         testAttachmentId = file.getId();
 
         Comment comment = new Comment();
-        comment.setText("Existing comment");
+        comment.setText("Bestaande opmerking");
         comment.setTimestamp(LocalDateTime.now());
         comment.setTicket(ticket);
         commentRepository.save(comment);
+    }
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
     }
 
     @Test
     public void testCreateTicket() throws Exception {
 
         // Arrange
-        String ticketJson = """
-                {
-                    "title": "Nieuwe Bug",
-                    "description": "Beschrijving etc...",
-                    "status": "OPEN",
-                    "type": "BUG",
-                    "projectId": %d,
-                    "assignedUsername": "%s"
-                }
-                """.formatted(testProjectId, testUsername);
-
-        MockMultipartFile ticketPart = new MockMultipartFile("ticket", "", "application/json", ticketJson.getBytes());
         MockMultipartFile filePart = new MockMultipartFile("file", "test.png", "image/png", "data".getBytes());
 
         // Act
         var result = mockMvc.perform(multipart("/tickets")
-                .file(ticketPart)
-                .file(filePart));
+                .file(filePart)
+                .param("title", "Nieuwe Bug")
+                .param("description", "Beschrijving etc...")
+                .param("status", "OPEN")
+                .param("type", "BUG")
+                .param("projectId", String.valueOf(testProjectId))
+                .param("assignedUsername", testUsername));
 
         // Assert
         result.andExpect(status().isCreated())
@@ -164,7 +175,19 @@ public class TicketControllerIntegrationTest {
     }
 
     @Test
+    public void testDeleteAttachment() throws Exception {
+
+        // Act
+        var result = mockMvc.perform(delete("/tickets/attachments/" + testAttachmentId));
+
+        // Assert
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").exists());
+    }
+
+    @Test
     public void testAddComment() throws Exception {
+
         // Arrange
         String json = """
                 {
@@ -190,7 +213,25 @@ public class TicketControllerIntegrationTest {
 
         // Assert
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].text").value("Existing comment"));
+                .andExpect(jsonPath("$[0].text").value("Bestaande opmerking"));
+    }
+
+    @Test
+    public void testDeleteComment() throws Exception {
+
+        // Arrange
+        Comment comment = new Comment();
+        comment.setText("Tijdelijke comment");
+        comment.setTimestamp(LocalDateTime.now());
+        comment.setTicket(ticketRepository.findById(testTicketId).orElseThrow());
+        comment = commentRepository.save(comment);
+
+        // Act
+        var result = mockMvc.perform(delete("/tickets/comments/" + comment.getId()));
+
+        // Assert
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").exists());
     }
 
     @Test
@@ -244,5 +285,25 @@ public class TicketControllerIntegrationTest {
         // Assert
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("CLOSED"));
+    }
+
+    @Test
+    public void testChangeTicketProject() throws Exception {
+
+        // Arrange
+        String json = """
+                {
+                    "projectId": %d
+                }
+                """.formatted(testProjectId);
+
+        // Act
+        var result = mockMvc.perform(put("/tickets/" + testTicketId + "/project")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json));
+
+        // Assert
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.projectId").value(testProjectId));
     }
 }

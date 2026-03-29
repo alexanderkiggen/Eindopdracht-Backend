@@ -8,7 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@SuppressWarnings("ALL")
+import java.util.List;
+
 @RestController
 @RequestMapping("/projects")
 public class ProjectController {
@@ -19,9 +20,28 @@ public class ProjectController {
         this.projectService = projectService;
     }
 
+    // Postman Request: [Project] Create New Project
     @PostMapping
     public ResponseEntity<ProjectOutputDto> createProject(@Valid @RequestBody ProjectInputDto projectInputDto) {
         ProjectOutputDto dto = projectService.createProject(projectInputDto);
         return new ResponseEntity<>(dto, HttpStatus.CREATED); // Status code: 201 Created
+    }
+
+    // Postman Request: [Project] Get All Projects
+    @GetMapping
+    public ResponseEntity<List<ProjectOutputDto>> getAllProjects() {
+        return ResponseEntity.ok(projectService.getAllProjects()); // Status code: 200 Ok
+    }
+
+    // Postman Request: [Project] Get Project By Id
+    @GetMapping("/{id}")
+    public ResponseEntity<ProjectOutputDto> getProjectById(@PathVariable("id") Integer id) {
+        return ResponseEntity.ok(projectService.getProjectById(id)); // Status code: 200 Ok
+    }
+
+    // Postman Request: [Project] Update Project
+    @PutMapping("/{id}")
+    public ResponseEntity<ProjectOutputDto> updateProject(@PathVariable("id") Integer id, @Valid @RequestBody ProjectInputDto dto) {
+        return ResponseEntity.ok(projectService.updateProject(id, dto)); // Status code: 200 Ok
     }
 }

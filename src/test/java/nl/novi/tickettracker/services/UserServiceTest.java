@@ -35,11 +35,42 @@ public class UserServiceTest {
     private UserService userService;
 
     @Test
+    public void testProvisionUserIfNeeded_UserExists() {
+
+        // Arrange
+        when(userRepository.findByUsername("johndoe")).thenReturn(Optional.of(new User()));
+
+        // Act
+        userService.provisionUserIfNeeded("johndoe", "test@email.nl");
+
+        // Assert
+        verify(userProfileRepository, never()).save(any(UserProfile.class));
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    public void testProvisionUserIfNeeded_UserDoesNotExist() {
+
+        // Arrange
+        when(userRepository.findByUsername("newuser")).thenReturn(Optional.empty());
+
+        UserProfile profile = new UserProfile();
+        when(userProfileRepository.save(any(UserProfile.class))).thenReturn(profile);
+
+        // Act
+        userService.provisionUserIfNeeded("newuser", "new@email.nl");
+
+        // Assert
+        verify(userProfileRepository, times(1)).save(any(UserProfile.class));
+        verify(userRepository, times(1)).save(any(User.class));
+    }
+
+    @Test
     public void testCreateUser_Success() {
+
         // Arrange
         UserInputDto inputDto = new UserInputDto();
         inputDto.setUsername("johndoe");
-        inputDto.setPassword("0000");
         inputDto.setFirstname("John");
         inputDto.setLastname("Doe");
         inputDto.setBio("Bio etc...");
@@ -74,6 +105,7 @@ public class UserServiceTest {
 
     @Test
     public void testGetAllUsers_Success() {
+
         // Arrange
         UserProfile profile1 = new UserProfile();
         profile1.setFirstname("john");
@@ -100,6 +132,7 @@ public class UserServiceTest {
 
     @Test
     public void testGetUserByUsername_Success() {
+
         // Arrange
         User user = new User();
         user.setId(5);
@@ -116,6 +149,7 @@ public class UserServiceTest {
 
     @Test
     public void testGetUserByUsername_NotFound() {
+
         // Arrange
         when(userRepository.findByUsername("onbekend")).thenReturn(Optional.empty());
 
@@ -128,6 +162,7 @@ public class UserServiceTest {
 
     @Test
     public void testUpdateUserProfile_Success_AllFields() {
+
         // Arrange
         UpdateUserProfileDto dto = new UpdateUserProfileDto();
         dto.setFirstname("NieuweVoornaam");
@@ -156,6 +191,7 @@ public class UserServiceTest {
 
     @Test
     public void testUpdateUserProfile_UserNotFound() {
+
         // Arrange
         UpdateUserProfileDto dto = new UpdateUserProfileDto();
         when(userRepository.findByUsername("onbekend")).thenReturn(Optional.empty());
@@ -166,6 +202,7 @@ public class UserServiceTest {
 
     @Test
     public void testUpdateUserProfile_ProfileNotFound() {
+
         // Arrange
         User userWithoutProfile = new User();
         userWithoutProfile.setUsername("geenprofiel");
@@ -180,6 +217,7 @@ public class UserServiceTest {
 
     @Test
     public void testUpdateUserProfile_Success_NoFieldsProvided() {
+
         // Arrange
         UpdateUserProfileDto dto = new UpdateUserProfileDto();
 

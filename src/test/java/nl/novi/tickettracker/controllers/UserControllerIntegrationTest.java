@@ -35,7 +35,6 @@ public class UserControllerIntegrationTest {
         profile1.setEmail("johndoe@novi-education.nl");
         User user1 = new User();
         user1.setUsername("johndoe");
-        user1.setPassword("0000");
         user1.setUserProfile(profile1);
         userRepository.save(user1);
 
@@ -45,34 +44,8 @@ public class UserControllerIntegrationTest {
         profile2.setLastname("Doe");
         User user2 = new User();
         user2.setUsername("janedoe");
-        user2.setPassword("0000");
         user2.setUserProfile(profile2);
         userRepository.save(user2);
-    }
-
-    @Test
-    public void testCreateUser() throws Exception {
-
-        // Arrange
-        String jsonBody = """
-                {
-                    "username": "newuser",
-                    "password": "0000",
-                    "email": "newuser@novi-education.nl",
-                    "firstname": "new",
-                    "lastname": "user",
-                    "birthdate": "2000-01-01T00:00:00"
-                }
-                """;
-
-        // Act
-        var result = mockMvc.perform(post("/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonBody));
-
-        // Assert
-        result.andExpect(status().isCreated())
-                .andExpect(jsonPath("$.username").value("newuser"));
     }
 
     @Test
