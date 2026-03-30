@@ -73,7 +73,35 @@ public class TicketService {
         }
     }
 
+    private void validateFile(MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File cannot be empty.");
+        }
+
+        String contentType = file.getContentType();
+        if (contentType == null || !isAllowedContentType(contentType)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Invalid file type. Only images (PNG, JPEG, WEBP, GIF) and documents (PDF, DOC, DOCX, TXT) are allowed.");
+        }
+    }
+
+    private boolean isAllowedContentType(String contentType) {
+        List<String> allowedTypes = List.of(
+                "image/png",
+                "image/jpeg",
+                "image/webp",
+                "image/gif",
+                "application/pdf",
+                "application/msword", // .doc
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+                "text/plain" // .txt
+        );
+        return allowedTypes.contains(contentType);
+    }
+
     public TicketOutputDto createTicket(TicketInputDto ticketInputDto, MultipartFile file) throws IOException {
+        validateFile(file);
+
         Ticket ticketEntity = transferToTicket(ticketInputDto);
         Ticket savedTicketEntity = ticketRepository.save(ticketEntity);
 
@@ -129,6 +157,7 @@ public class TicketService {
                 .orElseThrow(() -> new RecordNotFoundException("Ticket with ID " + ticketId + " not found."));
 
         validateDeveloperOwnership(ticketEntity);
+        validateFile(file);
 
         FileAttachment attachment = new FileAttachment();
         attachment.setFileName(StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename())));

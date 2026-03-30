@@ -14,6 +14,6 @@ class TicketTrackerApplicationTests {
 
     @Test
     void testMain() {
-        TicketTrackerApplication.main(new String[]{});
+        TicketTrackerApplication.main(new String[]{"--spring.profiles.active=test"});
     }
 }

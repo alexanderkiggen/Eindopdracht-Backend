@@ -29,6 +29,7 @@ VALUES
     (1, 'TicketTracker Backend',  'Ontwikkeling van de Spring Boot REST API voor het TicketTracker systeem.',  '2026-01-10 09:00:00'),
     (2, 'Klantportaal v2',        'Herontwerp van het klantportaal inclusief dashboard en rapportages.',        '2026-02-15 09:00:00'),
     (3, 'DevOps Pipeline',        'Opzetten van CI/CD pipelines en automatische deployments via GitHub Actions.', '2026-03-01 09:00:00')
+
 ON CONFLICT (id) DO NOTHING;
 
 -- Stap 4. Tickets
@@ -74,9 +75,27 @@ VALUES
     (10, 'README installatiehandleiding schrijven',
      'Volledige installatiehandleiding in README.md inclusief Keycloak configuratie, database setup en teststappen.',
      'IN_REVIEW',   'TASK',    3, 2)
+
 ON CONFLICT (id) DO NOTHING;
 
--- Stap 5. Comments
+-- Stap 5. File attachments
+
+INSERT INTO file_attachments (id, file_name, content_type, data, ticket_id)
+VALUES
+    (1,  'login-performancelog.pdf',    'application/pdf', decode('255044462d312e340a2525454f460a', 'hex'), 1),
+    (2,  'jwt-implementatie.pdf',       'application/pdf', decode('255044462d312e340a2525454f460a', 'hex'), 2),
+    (3,  'test-rapport.pdf',            'application/pdf', decode('255044462d312e340a2525454f460a', 'hex'), 3),
+    (4,  'dashboard-ontwerp.pdf',       'application/pdf', decode('255044462d312e340a2525454f460a', 'hex'), 4),
+    (5,  'crash-screenshot.pdf',        'application/pdf', decode('255044462d312e340a2525454f460a', 'hex'), 5),
+    (6,  'rbac-controle.pdf',           'application/pdf', decode('255044462d312e340a2525454f460a', 'hex'), 6),
+    (7,  'docker-compose-config.pdf',   'application/pdf', decode('255044462d312e340a2525454f460a', 'hex'), 7),
+    (8,  'paginering-ontwerp.pdf',      'application/pdf', decode('255044462d312e340a2525454f460a', 'hex'), 8),
+    (9,  'nullpointer-stacktrace.pdf',  'application/pdf', decode('255044462d312e340a2525454f460a', 'hex'), 9),
+    (10, 'readme-draft.pdf',            'application/pdf', decode('255044462d312e340a2525454f460a', 'hex'), 10)
+
+ON CONFLICT (id) DO NOTHING;
+
+-- Stap 6. Comments
 
 INSERT INTO comments (id, text, timestamp, ticket_id)
 VALUES
@@ -109,12 +128,14 @@ VALUES
 
     (10, 'Docker Compose basis werkt. Keycloak realm import nog toevoegen.',
      '2026-03-16 13:30:00', 7)
+
 ON CONFLICT (id) DO NOTHING;
 
--- Stap 6. Sequences resetten zodat nieuwe inserts via JPA geen conflicten veroorzaken met handmatig ingevoegde IDs.
+-- Stap 7. Sequences resetten zodat nieuwe inserts via JPA geen conflicten veroorzaken met handmatig ingevoegde IDs.
 
-SELECT setval('user_profiles_id_seq', (SELECT MAX(id) FROM user_profiles));
-SELECT setval('users_id_seq',         (SELECT MAX(id) FROM users));
-SELECT setval('projects_id_seq',      (SELECT MAX(id) FROM projects));
-SELECT setval('tickets_id_seq',       (SELECT MAX(id) FROM tickets));
-SELECT setval('comments_id_seq',      (SELECT MAX(id) FROM comments));
+SELECT setval('user_profiles_id_seq',    (SELECT MAX(id) FROM user_profiles));
+SELECT setval('users_id_seq',            (SELECT MAX(id) FROM users));
+SELECT setval('projects_id_seq',         (SELECT MAX(id) FROM projects));
+SELECT setval('tickets_id_seq',          (SELECT MAX(id) FROM tickets));
+SELECT setval('file_attachments_id_seq', (SELECT MAX(id) FROM file_attachments));
+SELECT setval('comments_id_seq',         (SELECT MAX(id) FROM comments));

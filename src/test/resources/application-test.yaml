@@ -10,7 +10,7 @@ spring:
     generate-ddl: true
     hibernate:
       ddl-auto: create
-    defer-datasource-initialization: true
+    defer-datasource-initialization: false
   sql:
     init:
-      mode: always
+      mode: never

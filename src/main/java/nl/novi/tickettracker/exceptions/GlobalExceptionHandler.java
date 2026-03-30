@@ -137,4 +137,14 @@ public class GlobalExceptionHandler {
         Map<String, Object> body = createStandardErrorBody(HttpStatus.BAD_REQUEST, message, request.getRequestURI());
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
+
+    // Vangt ResponseStatusExceptions af bij bestandsupload
+    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
+    public ResponseEntity<Map<String, Object>> handleResponseStatusException(org.springframework.web.server.ResponseStatusException ex, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.valueOf(ex.getStatusCode().value());
+        String message = ex.getReason() != null ? ex.getReason() : "Something went wrong.";
+
+        Map<String, Object> body = createStandardErrorBody(status, message, request.getRequestURI());
+        return new ResponseEntity<>(body, status);
+    }
 }

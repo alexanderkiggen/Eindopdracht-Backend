@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -582,6 +583,56 @@ public class TicketServiceTest {
 
         // Act & Assert
         assertThrows(RecordNotFoundException.class, () -> ticketService.uploadFileToTicket(1, mockFile));
+    }
+
+    @Test
+    public void testUploadFileToTicket_ThrowsException_WhenFileIsEmpty() {
+
+        // Arrange
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+
+        MockMultipartFile emptyFile = new MockMultipartFile("file", "test.txt", "text/plain", new byte[0]);
+
+        // Act & Assert
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> ticketService.uploadFileToTicket(1, emptyFile));
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertEquals("File cannot be empty.", exception.getReason());
+    }
+
+    @Test
+    public void testUploadFileToTicket_ThrowsException_WhenContentTypeIsNull() {
+
+        // Arrange
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+
+        MockMultipartFile nullContentTypeFile = new MockMultipartFile("file", "test.txt", null, "Data".getBytes());
+
+        // Act & Assert
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> ticketService.uploadFileToTicket(1, nullContentTypeFile));
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertNotNull(exception.getReason());
+        assertTrue(exception.getReason().contains("Invalid file type"));
+    }
+
+    @Test
+    public void testUploadFileToTicket_ThrowsException_WhenContentTypeIsInvalid() {
+
+        // Arrange
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+
+        MockMultipartFile invalidContentTypeFile = new MockMultipartFile("file", "virus.exe", "application/x-msdownload", "Data".getBytes());
+
+        // Act & Assert
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> ticketService.uploadFileToTicket(1, invalidContentTypeFile));
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertNotNull(exception.getReason());
+        assertTrue(exception.getReason().contains("Invalid file type"));
     }
 
     @Test
