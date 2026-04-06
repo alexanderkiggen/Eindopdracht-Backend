@@ -687,6 +687,64 @@ public class TicketServiceTest {
     }
 
     @Test
+    public void testAddCommentToTicket_WithJwtAuth_UserNotInDb() {
+
+        // Arrange
+        mockSecurityContext("johndoe", "ROLE_DEVELOPER");
+
+        User user = new User();
+        user.setUsername("johndoe");
+
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+        ticket.setAssignedUser(user);
+
+        CommentInputDto dto = new CommentInputDto();
+        dto.setText("Test");
+
+        Comment savedComment = new Comment();
+        savedComment.setId(5);
+        savedComment.setText("Test");
+        // Geen user aan gekoppeld!
+
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+        when(userRepository.findByUsername("johndoe")).thenReturn(Optional.empty());
+        when(commentRepository.save(any(Comment.class))).thenReturn(savedComment);
+
+        // Act
+        CommentOutputDto result = ticketService.addCommentToTicket(1, dto);
+
+        // Assert
+        assertNull(result.getUsername());
+    }
+
+    @Test
+    public void testDeleteComment_NonJwtAuthentication() {
+
+        // Arrange
+        org.springframework.security.core.Authentication auth =
+                new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                        "nonJwtUser", "password", List.of(new SimpleGrantedAuthority("ROLE_DEVELOPER")));
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+
+        Comment comment = new Comment();
+        comment.setId(1);
+        comment.setTicket(ticket);
+
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+        when(commentRepository.findById(1)).thenReturn(Optional.of(comment));
+
+        // Act
+        ticketService.deleteComment(1, 1);
+
+        // Assert
+        verify(commentRepository, times(1)).delete(comment);
+    }
+
+    @Test
     public void testAddCommentToTicket_NotFound() {
 
         // Arrange
