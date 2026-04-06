@@ -5,7 +5,7 @@ spring:
     deserialization:
       fail-on-unknown-properties: true
   datasource:
-    url: jdbc:postgresql://localhost:5432/tickettracker5
+    url: jdbc:postgresql://localhost:5432/tickettracker
     username: 'postgres'
     password: '0000'
   jpa:
