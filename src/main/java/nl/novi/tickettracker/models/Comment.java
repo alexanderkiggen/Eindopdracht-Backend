@@ -27,4 +27,8 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "ticket_id", nullable = false)
     private Ticket ticket;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }
