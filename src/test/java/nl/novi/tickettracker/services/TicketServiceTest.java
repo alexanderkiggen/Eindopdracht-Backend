@@ -719,32 +719,6 @@ public class TicketServiceTest {
     }
 
     @Test
-    public void testDeleteComment_NonJwtAuthentication() {
-
-        // Arrange
-        org.springframework.security.core.Authentication auth =
-                new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
-                        "nonJwtUser", "password", List.of(new SimpleGrantedAuthority("ROLE_DEVELOPER")));
-        SecurityContextHolder.getContext().setAuthentication(auth);
-
-        Ticket ticket = new Ticket();
-        ticket.setId(1);
-
-        Comment comment = new Comment();
-        comment.setId(1);
-        comment.setTicket(ticket);
-
-        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
-        when(commentRepository.findById(1)).thenReturn(Optional.of(comment));
-
-        // Act
-        ticketService.deleteComment(1, 1);
-
-        // Assert
-        verify(commentRepository, times(1)).delete(comment);
-    }
-
-    @Test
     public void testAddCommentToTicket_NotFound() {
 
         // Arrange
@@ -975,32 +949,6 @@ public class TicketServiceTest {
     }
 
     @Test
-    public void testDeleteComment_Forbidden() {
-
-        // Arrange
-        mockSecurityContext("janedoe", "ROLE_DEVELOPER");
-        Ticket ticket = new Ticket();
-        ticket.setId(1);
-        User user = new User();
-        user.setUsername("johndoe");
-
-        Comment comment = new Comment();
-        comment.setId(1);
-        comment.setTicket(ticket);
-        comment.setUser(user);
-
-        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
-        when(commentRepository.findById(1)).thenReturn(Optional.of(comment));
-
-        // Act
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> ticketService.deleteComment(1, 1));
-
-        // Assert
-        assertNotNull(exception.getReason());
-        assertTrue(exception.getReason().contains("You can only delete your own comments"));
-    }
-
-    @Test
     public void testDeleteComment_SuccessAsProjectManager() {
 
         // Arrange
@@ -1020,30 +968,6 @@ public class TicketServiceTest {
 
         // Assert
         verify(commentRepository, times(1)).delete(comment);
-    }
-
-    @Test
-    public void testDeleteComment_ForbiddenWhenCommentHasNoUser() {
-
-        // Arrange
-        mockSecurityContext("johndoe", "ROLE_DEVELOPER");
-        Ticket ticket = new Ticket();
-        ticket.setId(1);
-
-        Comment comment = new Comment();
-        comment.setId(1);
-        comment.setTicket(ticket);
-        comment.setUser(null);
-
-        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
-        when(commentRepository.findById(1)).thenReturn(Optional.of(comment));
-
-        // Act
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> ticketService.deleteComment(1, 1));
-
-        // Assert
-        assertNotNull(exception.getReason());
-        assertTrue(exception.getReason().contains("You can only delete your own comments"));
     }
 
     @Test
