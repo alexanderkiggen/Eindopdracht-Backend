@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,15 +28,46 @@ public class GlobalExceptionHandler {
         return body;
     }
 
-    // Validatiefouten (@NotBlank, @NotNull)
+    // Validatiefouten (@NotBlank, @NotNull) en Enum type mismatches in @ModelAttribute
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex, HttpServletRequest request) {
         String message = ex.getBindingResult().getFieldErrors().stream()
-                .map(FieldError::getDefaultMessage)
+                .map(error -> {
+                    if ("typeMismatch".equals(error.getCode())) {
+                        if ("status".equals(error.getField())) {
+                            return "Invalid Enum value provided for status. Accepted values are: [OPEN, IN_PROGRESS, IN_REVIEW, CLOSED, CANCELED]";
+                        } else if ("type".equals(error.getField())) {
+                            return "Invalid Enum value provided for type. Accepted values are: [BUG, FEATURE, TASK]";
+                        }
+                        return "Invalid value provided for field: " + error.getField();
+                    }
+                    return error.getDefaultMessage();
+                })
                 .collect(Collectors.joining("; "));
 
         Map<String, Object> body = createStandardErrorBody(HttpStatus.BAD_REQUEST, message, request.getRequestURI());
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST); // Status code: 400 Bad Request
+    }
+
+    // Validatiefouten @ModelAttribute
+    @ExceptionHandler(org.springframework.validation.BindException.class)
+    public ResponseEntity<Map<String, Object>> handleBindExceptions(org.springframework.validation.BindException ex, HttpServletRequest request) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> {
+                    if ("typeMismatch".equals(error.getCode())) {
+                        if ("status".equals(error.getField())) {
+                            return "Invalid Enum value provided for status. Accepted values are: [OPEN, IN_PROGRESS, IN_REVIEW, CLOSED, CANCELED]";
+                        } else if ("type".equals(error.getField())) {
+                            return "Invalid Enum value provided for type. Accepted values are: [BUG, FEATURE, TASK]";
+                        }
+                        return "Invalid type provided for field: " + error.getField();
+                    }
+                    return error.getDefaultMessage();
+                })
+                .collect(Collectors.joining("; "));
+
+        Map<String, Object> body = createStandardErrorBody(HttpStatus.BAD_REQUEST, message, request.getRequestURI());
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
     // Foute Enum waardes of onbekende velden
@@ -117,17 +147,6 @@ public class GlobalExceptionHandler {
 
         Map<String, Object> body = createStandardErrorBody(HttpStatus.CONFLICT, message, request.getRequestURI());
         return new ResponseEntity<>(body, HttpStatus.CONFLICT); // Status code: 409 Conflict
-    }
-
-    // Validatiefouten @ModelAttribute
-    @ExceptionHandler(org.springframework.validation.BindException.class)
-    public ResponseEntity<Map<String, Object>> handleBindExceptions(org.springframework.validation.BindException ex, HttpServletRequest request) {
-        String message = ex.getBindingResult().getFieldErrors().stream()
-                .map(FieldError::getDefaultMessage)
-                .collect(Collectors.joining("; "));
-
-        Map<String, Object> body = createStandardErrorBody(HttpStatus.BAD_REQUEST, message, request.getRequestURI());
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
     // Vangt fout af als @RequestParam("file") ontbreekt
