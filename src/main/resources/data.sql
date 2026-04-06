@@ -97,37 +97,37 @@ ON CONFLICT (id) DO NOTHING;
 
 -- Stap 6. Comments
 
-INSERT INTO comments (id, text, timestamp, ticket_id)
+INSERT INTO comments (id, text, timestamp, ticket_id, user_id)
 VALUES
     (1,  'Gereproduceerd op lokale omgeving. Lijkt op een database connection pool issue. Ga dit verder onderzoeken.',
-     '2026-03-10 10:30:00', 1),
+     '2026-03-10 10:30:00', 1, 1),
 
     (2,  'Ik pak dit op na het afronden van de refresh token implementatie.',
-     '2026-03-10 14:00:00', 1),
+     '2026-03-10 14:00:00', 1, 2),
 
     (3,  'Eerste implementatie klaar. Wacht op code review van John Smith voordat ik verder ga.',
-     '2026-03-11 14:15:00', 2),
+     '2026-03-11 14:15:00', 2, 2),
 
     (4,  'Code review ingepland voor morgenochtend.',
-     '2026-03-12 09:00:00', 2),
+     '2026-03-12 09:00:00', 2, 3),
 
     (5,  'Tests zijn bijna klaar. Wacht nog op goedkeuring van de service-laag implementatie.',
-     '2026-03-12 09:45:00', 3),
+     '2026-03-12 09:45:00', 3, 1),
 
     (6,  'Prioriteit verhoogd door de product owner. Graag voor sprint-einde afronden.',
-     '2026-03-13 16:00:00', 4),
+     '2026-03-13 16:00:00', 4, 3),
 
     (7,  'Bug bevestigd. De MaxUploadSizeExceededException wordt nu correct afgehandeld door de GlobalExceptionHandler.',
-     '2026-03-14 11:20:00', 5),
+     '2026-03-14 11:20:00', 5, 1),
 
     (8,  'Opgelost in commit a3f9c12. Maximale bestandsgrootte ingesteld op 10MB in application.yaml.',
-     '2026-03-14 15:45:00', 5),
+     '2026-03-14 15:45:00', 5, 1),
 
     (9,  'Alle DEVELOPER-endpoints getest. Twee endpoints missen nog de juiste rolcontrole.',
-     '2026-03-15 10:00:00', 6),
+     '2026-03-15 10:00:00', 6, 2),
 
     (10, 'Docker Compose basis werkt. Keycloak realm import nog toevoegen.',
-     '2026-03-16 13:30:00', 7)
+     '2026-03-16 13:30:00', 7, 1)
 
 ON CONFLICT (id) DO NOTHING;
 
