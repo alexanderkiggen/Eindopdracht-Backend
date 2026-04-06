@@ -7,9 +7,10 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@JsonPropertyOrder({"id", "text", "timestamp"})
+@JsonPropertyOrder({"id", "text", "timestamp", "username"})
 public class CommentOutputDto {
     public Integer id;
     public String text;
     public LocalDateTime timestamp;
+    public String username;
 }
