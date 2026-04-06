@@ -1,6 +1,8 @@
 package nl.novi.tickettracker.controllers;
 
 import java.util.Map;
+import java.time.Instant;
+import java.util.LinkedHashMap;
 import jakarta.validation.Valid;
 import nl.novi.tickettracker.dtos.*;
 import nl.novi.tickettracker.models.FileAttachment;
@@ -82,6 +84,19 @@ public class TicketController {
         return new ResponseEntity<>(ticketOutputDto, HttpStatus.OK); // Status code: 200 Ok
     }
 
+    // Postman Request: [Ticket] Delete Ticket
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, Object>> deleteTicket(@PathVariable("id") Integer id) {
+        ticketService.deleteTicket(id);
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("timestamp", Instant.now().toString());
+        response.put("status", HttpStatus.OK.value());
+        response.put("message", "Ticket with ID " + id + " was successfully deleted.");
+
+        return ResponseEntity.ok(response); // Status code: 200 Ok
+    }
+
     // Postman Request: [Attachment] Upload File to Ticket
     @PostMapping("/{id}/attachments")
     public ResponseEntity<FileAttachmentOutputDto> uploadFile(
@@ -103,6 +118,19 @@ public class TicketController {
                 .body(fileAttachment.getData()); // Status code: 200 Ok
     }
 
+    // Postman Request: [Attachment] Delete File
+    @DeleteMapping("/attachments/{attachmentId}")
+    public ResponseEntity<Map<String, Object>> deleteAttachment(@PathVariable("attachmentId") Integer attachmentId) {
+        ticketService.deleteAttachment(attachmentId);
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("timestamp", Instant.now().toString());
+        response.put("status", HttpStatus.OK.value());
+        response.put("message", "Attachment with ID " + attachmentId + " was successfully deleted.");
+
+        return ResponseEntity.ok(response); // Status code: 200 Ok
+    }
+
     // Postman Request: [Comment] Add Comment
     @PostMapping("/{id}/comments")
     public ResponseEntity<CommentOutputDto> addComment(
@@ -118,6 +146,21 @@ public class TicketController {
     public ResponseEntity<List<CommentOutputDto>> getComments(@PathVariable("id") Integer ticketId) {
         List<CommentOutputDto> dtos = ticketService.getCommentsForTicket(ticketId);
         return ResponseEntity.ok(dtos); // Status code: 200 Ok
+    }
+
+    // Postman Request: [Comment] Delete Comment
+    @DeleteMapping("/{ticketId}/comments/{commentId}")
+    public ResponseEntity<Map<String, Object>> deleteComment(
+            @PathVariable("ticketId") Integer ticketId,
+            @PathVariable("commentId") Integer commentId) {
+        ticketService.deleteComment(ticketId, commentId);
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("timestamp", Instant.now().toString());
+        response.put("status", HttpStatus.OK.value());
+        response.put("message", "Comment with ID " + commentId + " was successfully deleted from ticket " + ticketId + ".");
+
+        return ResponseEntity.ok(response); // Status code: 200 Ok
     }
 
     // Postman Request: [Ticket] Get Tickets By Project
