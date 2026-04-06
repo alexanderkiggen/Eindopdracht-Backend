@@ -1,6 +1,5 @@
 # TicketTracker - Installatiehandleiding
 
----
 
 ## Inhoudsopgave
 
@@ -13,13 +12,11 @@
 7. [Testgebruikers en user-rollen](#7-testgebruikers-en-user-rollen)
 8. [Overige commando's](#8-overige-commandos)
 
----
 
 ## 1. Inleiding
 
 Dit document beschrijft hoe de TicketTracker web-API geïnstalleerd en gebruikt kan worden. TicketTracker is een backend web-API gebouwd met [Spring Boot](https://spring.io/projects/spring-boot) waarmee ontwikkelteams tickets (zoals bugs, taken en features) kunnen beheren en structureren. De applicatie maakt gebruik van PostgreSQL voor dataopslag en [Keycloak](https://www.keycloak.org/) voor authenticatie en autorisatie via JWT-tokens.
 
----
 
 ## 2. Beschrijving en functionaliteit
 
@@ -32,13 +29,11 @@ TicketTracker is een beveiligde REST web-API ontworpen voor kleine ontwikkelteam
 - **Projectorganisatie**: Tickets koppelen aan projecten en toewijzen aan developers.
 - **Communicatie**: Opmerkingen plaatsen en inzien per ticket.
 
----
 
 ## 3. Projectstructuur en gebruikte technieken
 
 ### Projectstructuur
 
-```
 src/
 ├── main/
 │   ├── java/nl/novi/tickettracker/
@@ -90,7 +85,7 @@ Om de web-API te starten moet de volgende software op je systeem geïnstalleerd 
 - **Keycloak 24+**: [https://www.keycloak.org/downloads](https://www.keycloak.org/downloads)
 - **Postman** (optioneel, voor het testen van endpoints): [https://www.postman.com/downloads](https://www.postman.com/downloads)  
   De Postman-collectie is meegeleverd als `tickettracker_postman_collection.json` in de root van het project.
-  Importeer dit in Postman via **File → Import** en raadpleeg de API-documentatie voor verdere configuratie.
+  Importeer dit in Postman via File → Import en raadpleeg de API-documentatie voor verdere configuratie.
   Controleer de installaties met:
 
 ```bash
@@ -99,7 +94,6 @@ mvn -version
 psql --version
 ```
 
----
 
 ## 5. Installatie instructies
 
@@ -200,7 +194,6 @@ mvn spring-boot:run
 
 De applicatie start op `http://localhost:8080`. Bij de eerste start worden automatisch de tabellen aangemaakt en de testdata uit `data.sql` geladen.
 
----
 
 ## 6. Uitvoeren van tests
 
@@ -231,7 +224,6 @@ mvn test
 - **Mockito**: Mocking van dependencies in unit-tests
 - **H2**: In-memory database tijdens tests
 
----
 
 ## 7. Testgebruikers en user-rollen
 
@@ -244,7 +236,6 @@ De volgende gebruikers worden automatisch aangemaakt via `data.sql`. Zorg ervoor
 | `johnsmith`    | PROJECTMANAGER   | Alle rechten van DEVELOPER + projecten aanmaken/bewerken, developers toewijzen aan tickets, tickets naar andere projecten verplaatsen en het verwijderen van tickets, opmerkingen en bestanden |
 | `no_roles_user`| (geen)           | Geen toegang tot endpoints (alleen voor het testen van 403-scenario's)                                                                                                                         |
 
----
 
 ## 8. Overige commando's
 
