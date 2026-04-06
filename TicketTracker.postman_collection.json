@@ -1,0 +1,1873 @@
+{
+  "info": {
+    "_postman_id": "9fa191f3-d014-40ca-b89b-d0bcbdf09473",
+    "name": "TicketTracker",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "49319677",
+    "_collection_link": "https://go.postman.co/collection/49319677-9fa191f3-d014-40ca-b89b-d0bcbdf09473?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "[User] Get All Users",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "tokenName",
+                  "value": "TicketTrackerAuth",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "{{Client-secret}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{Client-id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{Token-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{Authorization-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "challengeAlgorithm",
+                  "value": "S256",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/users",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[User] Get User By Username",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "tokenName",
+                  "value": "TicketTrackerAuth",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "{{Client-secret}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{Client-id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{Token-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{Authorization-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "challengeAlgorithm",
+                  "value": "S256",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/users/johndoe",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "users",
+                "johndoe"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[User] Update User Profile",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "tokenName",
+                  "value": "TicketTrackerAuth",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "{{Client-secret}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{Client-id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{Token-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{Authorization-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "challengeAlgorithm",
+                  "value": "S256",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"bio\": \"Junior Backend Developer\",\r\n  \"phone\": \"0645325678\",\r\n  \"birthdate\": \"1990-12-08T00:00:00\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/users/johndoe/profile",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "users",
+                "johndoe",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "[Project] Create New Project",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "tokenName",
+                  "value": "TicketTrackerAuth",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "{{Client-secret}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{Client-id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{Token-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{Authorization-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "challengeAlgorithm",
+                  "value": "S256",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"TicketSysteem Backend\",\r\n  \"description\": \"De volledige backend API voor de NOVI eindopdracht.\",\r\n  \"startDate\": \"2026-04-26T09:00:00\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/projects",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "projects"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[Project] Get All Projects",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "tokenName",
+                  "value": "TicketTrackerAuth",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "{{Client-secret}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{Client-id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{Token-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{Authorization-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "challengeAlgorithm",
+                  "value": "S256",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/projects",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "projects"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[Project] Get Project By ID",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "tokenName",
+                  "value": "TicketTrackerAuth",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "{{Client-secret}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{Client-id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{Token-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{Authorization-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "challengeAlgorithm",
+                  "value": "S256",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/projects",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "projects"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[Project] Update Project",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "tokenName",
+                  "value": "TicketTrackerAuth",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "{{Client-secret}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{Client-id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{Token-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{Authorization-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "challengeAlgorithm",
+                  "value": "S256",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"TicketSysteem Backend\",\r\n  \"description\": \"De volledige test backend API voor de NOVI eindopdracht.\",\r\n  \"startDate\": \"2026-04-26T09:00:00\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/projects/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "projects",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tickets",
+      "item": [
+        {
+          "name": "[Ticket] Create New Ticket",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "tokenName",
+                  "value": "TicketTrackerAuth",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "{{Client-secret}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{Client-id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{Token-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{Authorization-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "challengeAlgorithm",
+                  "value": "S256",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "2e349a68-e3be-4b0e-a40a-0b40a9f83e94",
+                  "src": "postman-cloud:///1f129141-694c-47d0-8e93-c2b800afb74f"
+                },
+                {
+                  "key": "title",
+                  "value": "Probleem gevonden bij...",
+                  "type": "text",
+                  "uuid": "f8a25903-4795-4210-af24-c588d8014904"
+                },
+                {
+                  "key": "description",
+                  "value": "Beschrijving...",
+                  "type": "text",
+                  "uuid": "f7034f28-d077-4e21-b168-53e8950899e2"
+                },
+                {
+                  "key": "type",
+                  "value": "BUG",
+                  "type": "text",
+                  "uuid": "23581ac1-b1cb-4515-8c50-f8d5318ae598"
+                },
+                {
+                  "key": "status",
+                  "value": "OPEN",
+                  "type": "text",
+                  "uuid": "ea717e31-74f4-4592-ac17-fc704368aaa3"
+                },
+                {
+                  "key": "projectId",
+                  "value": "1",
+                  "type": "text",
+                  "uuid": "79f4fa4b-09c6-4669-89ba-5693a45fa420"
+                },
+                {
+                  "key": "assignedUsername",
+                  "value": "johndoe",
+                  "type": "text",
+                  "uuid": "d436afc0-2186-4885-8a33-cd10f9b0aedb"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:8080/tickets",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "tickets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[Ticket] Get All Tickets",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "tokenName",
+                  "value": "TicketTrackerAuth",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "{{Client-secret}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{Client-id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{Token-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{Authorization-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "challengeAlgorithm",
+                  "value": "S256",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/tickets?page=0&size=20&sortField=id&sortDirection=ASC",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "tickets"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                },
+                {
+                  "key": "sortField",
+                  "value": "id"
+                },
+                {
+                  "key": "sortDirection",
+                  "value": "ASC"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[Tickter] Get all Tickets From Project",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "tokenName",
+                  "value": "TicketTrackerAuth",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "{{Client-secret}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{Client-id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{Token-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{Authorization-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "challengeAlgorithm",
+                  "value": "S256",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/tickets/project/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "tickets",
+                "project",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[Ticket] Get Ticket By ID",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "tokenName",
+                  "value": "TicketTrackerAuth",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "{{Client-secret}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{Client-id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{Token-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{Authorization-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "challengeAlgorithm",
+                  "value": "S256",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/tickets/1werw",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "tickets",
+                "1werw"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[Ticket] Assign Developer",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "tokenName",
+                  "value": "TicketTrackerAuth",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "{{Client-secret}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{Client-id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{Token-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{Authorization-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "challengeAlgorithm",
+                  "value": "S256",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"johndoe\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/tickets/1/assign",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "tickets",
+                "1",
+                "assign"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[Ticket] Update Ticket Status",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "tokenName",
+                  "value": "TicketTrackerAuth",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "{{Client-secret}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{Client-id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{Token-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{Authorization-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "challengeAlgorithm",
+                  "value": "S256",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"status\": \"IN_REVIEW\" \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/tickets/1/status",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "tickets",
+                "1",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[Ticket] Change Project of Ticket",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "tokenName",
+                  "value": "TicketTrackerAuth",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "{{Client-secret}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{Client-id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{Token-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{Authorization-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "challengeAlgorithm",
+                  "value": "S256",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"projectId\": 2\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/tickets/1/project",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "tickets",
+                "1",
+                "project"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[Ticket] Delete Ticket",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "tokenName",
+                  "value": "TicketTrackerAuth",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "{{Client-secret}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{Client-id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{Token-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{Authorization-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "challengeAlgorithm",
+                  "value": "S256",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/tickets/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "tickets",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Comments",
+      "item": [
+        {
+          "name": "[Comment] Add Comment to Ticket",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "tokenName",
+                  "value": "TicketTrackerAuth",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "{{Client-secret}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{Client-id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{Token-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{Authorization-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "challengeAlgorithm",
+                  "value": "S256",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"text\": \"Ik ben gestart met deze bug, maar ik kan het probleem niet reproduceren.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/tickets/1/comments",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "tickets",
+                "1",
+                "comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[Comment] Get Comments of Ticket",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "tokenName",
+                  "value": "TicketTrackerAuth",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "{{Client-secret}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{Client-id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{Token-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{Authorization-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "challengeAlgorithm",
+                  "value": "S256",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/tickets/1/comments",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "tickets",
+                "1",
+                "comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[Comment] Delete Comment",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "tokenName",
+                  "value": "TicketTrackerAuth",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "{{Client-secret}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{Client-id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{Token-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{Authorization-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "challengeAlgorithm",
+                  "value": "S256",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/tickets/1/comments/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "tickets",
+                "1",
+                "comments",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Attachments",
+      "item": [
+        {
+          "name": "[Attachment] Upload File to Ticket",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "tokenName",
+                  "value": "TicketTrackerAuth",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "{{Client-secret}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{Client-id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{Token-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{Authorization-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "challengeAlgorithm",
+                  "value": "S256",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "f3d59b8b-395f-43e3-bc7c-4732228d6a7a",
+                  "src": "postman-cloud:///1f129141-694c-47d0-8e93-c2b800afb74f"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:8080/tickets/1/attachments",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "tickets",
+                "1",
+                "attachments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[Attachment] Download File",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "tokenName",
+                  "value": "TicketTrackerAuth",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "{{Client-secret}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{Client-id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{Token-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{Authorization-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "challengeAlgorithm",
+                  "value": "S256",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/tickets/attachments/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "tickets",
+                "attachments",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "[Attachment] Delete File",
+          "request": {
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "tokenName",
+                  "value": "TicketTrackerAuth",
+                  "type": "string"
+                },
+                {
+                  "key": "clientSecret",
+                  "value": "{{Client-secret}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{Client-id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{Token-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{Authorization-url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "https://oauth.pstmn.io/v1/callback",
+                  "type": "string"
+                },
+                {
+                  "key": "challengeAlgorithm",
+                  "value": "S256",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "useBrowser",
+                  "value": false,
+                  "type": "boolean"
+                },
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/tickets/attachments/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "tickets",
+                "attachments",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
