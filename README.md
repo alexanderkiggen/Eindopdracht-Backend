@@ -34,6 +34,7 @@ TicketTracker is een beveiligde REST web-API ontworpen voor kleine ontwikkelteam
 
 ### Projectstructuur
 
+```
 src/
 ├── main/
 │   ├── java/nl/novi/tickettracker/
