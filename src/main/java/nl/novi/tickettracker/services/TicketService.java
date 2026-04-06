@@ -152,6 +152,22 @@ public class TicketService {
         return transferToDto(savedTicket);
     }
 
+    public void deleteTicket(Integer ticketId) {
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new RecordNotFoundException("Ticket with ID " + ticketId + " not found."));
+
+        // Verwijder alle gekoppelde attachments
+        List<FileAttachment> attachments = fileAttachmentRepository.findByTicketId(ticketId);
+        fileAttachmentRepository.deleteAll(attachments);
+
+        // Verwijder alle gekoppelde comments
+        List<Comment> comments = commentRepository.findByTicketId(ticketId);
+        commentRepository.deleteAll(comments);
+
+        // Verwijder het ticket
+        ticketRepository.delete(ticket);
+    }
+
     public FileAttachmentOutputDto uploadFileToTicket(Integer ticketId, MultipartFile file) throws IOException {
         Ticket ticketEntity = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new RecordNotFoundException("Ticket with ID " + ticketId + " not found."));
@@ -179,6 +195,20 @@ public class TicketService {
                 .orElseThrow(() -> new RecordNotFoundException("File with ID " + attachmentId + " not found."));
     }
 
+    public void deleteAttachment(Integer attachmentId) {
+        FileAttachment attachment = fileAttachmentRepository.findById(attachmentId)
+                .orElseThrow(() -> new RecordNotFoundException("Attachment with ID " + attachmentId + " not found."));
+
+        Ticket ticket = attachment.getTicket();
+        validateDeveloperOwnership(ticket);
+
+        List<FileAttachment> currentAttachments = fileAttachmentRepository.findByTicketId(ticket.getId());
+        if (currentAttachments.size() <= 1) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot delete the last attachment. A ticket must have at least one attachment.");
+        }
+
+        fileAttachmentRepository.delete(attachment);
+    }
 
     public CommentOutputDto addCommentToTicket(Integer ticketId, CommentInputDto dto) {
         Ticket ticket = ticketRepository.findById(ticketId)
@@ -191,6 +221,12 @@ public class TicketService {
         comment.setTimestamp(java.time.LocalDateTime.now());
         comment.setTicket(ticket);
 
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof Jwt jwt) {
+            String loggedInUsername = jwt.getClaimAsString("preferred_username");
+            userRepository.findByUsername(loggedInUsername).ifPresent(comment::setUser);
+        }
+
         Comment savedComment = commentRepository.save(comment);
 
         CommentOutputDto output = new CommentOutputDto();
@@ -198,7 +234,25 @@ public class TicketService {
         output.setText(savedComment.getText());
         output.setTimestamp(savedComment.getTimestamp());
 
+        if (savedComment.getUser() != null) {
+            output.setUsername(savedComment.getUser().getUsername());
+        }
+
         return output;
+    }
+
+    public void deleteComment(Integer ticketId, Integer commentId) {
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new RecordNotFoundException("Ticket with ID " + ticketId + " not found."));
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RecordNotFoundException("Comment with ID " + commentId + " not found."));
+
+        if (!comment.getTicket().getId().equals(ticket.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Comment does not belong to this ticket.");
+        }
+
+        commentRepository.delete(comment);
     }
 
     public List<CommentOutputDto> getCommentsForTicket(Integer ticketId) {
@@ -213,6 +267,9 @@ public class TicketService {
             dto.setId(c.getId());
             dto.setText(c.getText());
             dto.setTimestamp(c.getTimestamp());
+            if (c.getUser() != null) {
+                dto.setUsername(c.getUser().getUsername());
+            }
             return dto;
         }).toList();
     }
@@ -291,6 +348,9 @@ public class TicketService {
                 cDto.setId(c.getId());
                 cDto.setText(c.getText());
                 cDto.setTimestamp(c.getTimestamp());
+                if (c.getUser() != null) {
+                    cDto.setUsername(c.getUser().getUsername());
+                }
                 return cDto;
             }).toList();
             dto.setComments(commentDtos);
