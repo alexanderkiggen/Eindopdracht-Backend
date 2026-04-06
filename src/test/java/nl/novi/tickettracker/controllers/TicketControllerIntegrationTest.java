@@ -277,4 +277,58 @@ public class TicketControllerIntegrationTest {
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.projectId").value(testProjectId));
     }
+
+    @Test
+    public void testDeleteTicket() throws Exception {
+
+        // Act
+        var result = mockMvc.perform(delete("/tickets/" + testTicketId));
+
+        // Assert
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Ticket with ID " + testTicketId + " was successfully deleted."));
+    }
+
+    @Test
+    public void testDeleteAttachment() throws Exception {
+
+        // Arrange
+        Ticket ticket = ticketRepository.findById(testTicketId).orElseThrow();
+
+        FileAttachment extraFile = new FileAttachment();
+        extraFile.setFileName("extra.pdf");
+        extraFile.setContentType("application/pdf");
+        extraFile.setData("Data".getBytes());
+        extraFile.setTicket(ticket);
+        fileAttachmentRepository.save(extraFile);
+
+        // Act
+        var result = mockMvc.perform(delete("/tickets/attachments/" + testAttachmentId));
+
+        // Assert
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Attachment with ID " + testAttachmentId + " was successfully deleted."));
+    }
+
+    @Test
+    public void testDeleteComment() throws Exception {
+
+        // Arrange
+        Ticket ticket = ticketRepository.findById(testTicketId).orElseThrow();
+        User user = userRepository.findByUsername(testUsername).orElseThrow();
+
+        Comment myComment = new Comment();
+        myComment.setText("Mijn comment om te verwijderen");
+        myComment.setTimestamp(LocalDateTime.now());
+        myComment.setTicket(ticket);
+        myComment.setUser(user);
+        myComment = commentRepository.save(myComment);
+
+        // Act
+        var result = mockMvc.perform(delete("/tickets/" + testTicketId + "/comments/" + myComment.getId()));
+
+        // Assert
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Comment with ID " + myComment.getId() + " was successfully deleted from ticket " + testTicketId + "."));
+    }
 }
