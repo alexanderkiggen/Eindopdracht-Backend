@@ -3,9 +3,9 @@
 
 ## Inhoudsopgave
 
-1. [Inleiding](#inleiding)
-2. [Beschrijving en functionaliteit](#beschrijving-en-functionaliteit)
-3. [Projectstructuur en gebruikte technieken](#projectstructuur-en-gebruikte-technieken)
+1. [Inleiding](#1-inleiding)
+2. [Beschrijving en functionaliteit](#2-beschrijving-en-functionaliteit)
+3. [Projectstructuur en gebruikte technieken](#3-projectstructuur-en-gebruikte-technieken)
 4. [Benodigdheden](#4-benodigdheden)
 5. [Installatie instructies](#5-installatie-instructies)
 6. [Uitvoeren van tests](#6-uitvoeren-van-tests)
