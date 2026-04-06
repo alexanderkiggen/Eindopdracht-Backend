@@ -35,8 +35,6 @@ public class UserService {
             user.setUsername(username);
             user.setUserProfile(savedProfile);
             userRepository.save(user);
-
-            System.out.println("New keycloak user added to database: " + username);
         }
     }
 
