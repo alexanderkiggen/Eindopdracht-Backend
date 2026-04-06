@@ -783,4 +783,266 @@ public class TicketServiceTest {
         // Act & Assert
         assertThrows(RecordNotFoundException.class, () -> ticketService.getCommentsForTicket(1));
     }
+
+    @Test
+    public void testDeleteTicket_Success() {
+
+        // Arrange
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+        when(fileAttachmentRepository.findByTicketId(1)).thenReturn(List.of(new FileAttachment()));
+        when(commentRepository.findByTicketId(1)).thenReturn(List.of(new Comment()));
+
+        // Act
+        ticketService.deleteTicket(1);
+
+        // Assert
+        verify(fileAttachmentRepository, times(1)).deleteAll(anyList());
+        verify(commentRepository, times(1)).deleteAll(anyList());
+        verify(ticketRepository, times(1)).delete(ticket);
+    }
+
+    @Test
+    public void testDeleteTicket_NotFound() {
+
+        // Arrange
+        when(ticketRepository.findById(1)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(RecordNotFoundException.class, () -> ticketService.deleteTicket(1));
+    }
+
+    @Test
+    public void testDeleteAttachment_Success() {
+
+        // Arrange
+        mockSecurityContext("johndoe", "ROLE_DEVELOPER");
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+        User user = new User();
+        user.setUsername("johndoe");
+        ticket.setAssignedUser(user);
+
+        FileAttachment attachment1 = new FileAttachment();
+        attachment1.setId(1);
+        attachment1.setTicket(ticket);
+
+        FileAttachment attachment2 = new FileAttachment();
+        attachment2.setId(2);
+        attachment2.setTicket(ticket);
+
+        when(fileAttachmentRepository.findById(1)).thenReturn(Optional.of(attachment1));
+        when(fileAttachmentRepository.findByTicketId(1)).thenReturn(List.of(attachment1, attachment2));
+
+        // Act
+        ticketService.deleteAttachment(1);
+
+        // Assert
+        verify(fileAttachmentRepository, times(1)).delete(attachment1);
+    }
+
+    @Test
+    public void testDeleteAttachment_NotFound() {
+
+        // Arrange
+        when(fileAttachmentRepository.findById(1)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(RecordNotFoundException.class, () -> ticketService.deleteAttachment(1));
+    }
+
+    @Test
+    public void testDeleteAttachment_LastAttachment() {
+
+        // Arrange
+        mockSecurityContext("johndoe", "ROLE_DEVELOPER");
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+        User user = new User();
+        user.setUsername("johndoe");
+        ticket.setAssignedUser(user);
+
+        FileAttachment attachment = new FileAttachment();
+        attachment.setId(1);
+        attachment.setTicket(ticket);
+
+        when(fileAttachmentRepository.findById(1)).thenReturn(Optional.of(attachment));
+        when(fileAttachmentRepository.findByTicketId(1)).thenReturn(List.of(attachment));
+
+        // Act
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> ticketService.deleteAttachment(1));
+
+        // Assert
+        assertNotNull(exception.getReason());
+        assertTrue(exception.getReason().contains("Cannot delete the last attachment"));
+    }
+
+    @Test
+    public void testDeleteComment_Success() {
+
+        // Arrange
+        mockSecurityContext("johndoe", "ROLE_DEVELOPER");
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+        User user = new User();
+        user.setUsername("johndoe");
+
+        Comment comment = new Comment();
+        comment.setId(1);
+        comment.setTicket(ticket);
+        comment.setUser(user);
+
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+        when(commentRepository.findById(1)).thenReturn(Optional.of(comment));
+
+        // Act
+        ticketService.deleteComment(1, 1);
+
+        // Assert
+        verify(commentRepository, times(1)).delete(comment);
+    }
+
+    @Test
+    public void testDeleteComment_NoAuthentication() {
+
+        // Arrange
+        SecurityContextHolder.clearContext();
+
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+
+        Comment comment = new Comment();
+        comment.setId(1);
+        comment.setTicket(ticket);
+
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+        when(commentRepository.findById(1)).thenReturn(Optional.of(comment));
+
+        // Act
+        ticketService.deleteComment(1, 1);
+
+        // Assert
+        verify(commentRepository, times(1)).delete(comment);
+    }
+
+    @Test
+    public void testDeleteComment_TicketNotFound() {
+
+        // Arrange
+        when(ticketRepository.findById(1)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(RecordNotFoundException.class, () -> ticketService.deleteComment(1, 1));
+    }
+
+    @Test
+    public void testDeleteComment_CommentNotFound() {
+
+        // Arrange
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+        when(commentRepository.findById(1)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(RecordNotFoundException.class, () -> ticketService.deleteComment(1, 1));
+    }
+
+    @Test
+    public void testDeleteComment_NotBelongingToTicket() {
+
+        // Arrange
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+        Ticket otherTicket = new Ticket();
+        otherTicket.setId(2);
+
+        Comment comment = new Comment();
+        comment.setId(1);
+        comment.setTicket(otherTicket);
+
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+        when(commentRepository.findById(1)).thenReturn(Optional.of(comment));
+
+        // Act
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> ticketService.deleteComment(1, 1));
+
+        // Assert
+        assertNotNull(exception.getReason());
+        assertTrue(exception.getReason().contains("does not belong to this ticket"));
+    }
+
+    @Test
+    public void testDeleteComment_Forbidden() {
+
+        // Arrange
+        mockSecurityContext("janedoe", "ROLE_DEVELOPER");
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+        User user = new User();
+        user.setUsername("johndoe");
+
+        Comment comment = new Comment();
+        comment.setId(1);
+        comment.setTicket(ticket);
+        comment.setUser(user);
+
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+        when(commentRepository.findById(1)).thenReturn(Optional.of(comment));
+
+        // Act
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> ticketService.deleteComment(1, 1));
+
+        // Assert
+        assertNotNull(exception.getReason());
+        assertTrue(exception.getReason().contains("You can only delete your own comments"));
+    }
+
+    @Test
+    public void testDeleteComment_SuccessAsProjectManager() {
+
+        // Arrange
+        mockSecurityContext("admin", "ROLE_PROJECTMANAGER");
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+
+        Comment comment = new Comment();
+        comment.setId(1);
+        comment.setTicket(ticket);
+
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+        when(commentRepository.findById(1)).thenReturn(Optional.of(comment));
+
+        // Act
+        ticketService.deleteComment(1, 1);
+
+        // Assert
+        verify(commentRepository, times(1)).delete(comment);
+    }
+
+    @Test
+    public void testDeleteComment_ForbiddenWhenCommentHasNoUser() {
+
+        // Arrange
+        mockSecurityContext("johndoe", "ROLE_DEVELOPER");
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+
+        Comment comment = new Comment();
+        comment.setId(1);
+        comment.setTicket(ticket);
+        comment.setUser(null);
+
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+        when(commentRepository.findById(1)).thenReturn(Optional.of(comment));
+
+        // Act
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> ticketService.deleteComment(1, 1));
+
+        // Assert
+        assertNotNull(exception.getReason());
+        assertTrue(exception.getReason().contains("You can only delete your own comments"));
+    }
 }
