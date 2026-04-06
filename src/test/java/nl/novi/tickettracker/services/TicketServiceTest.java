@@ -1045,4 +1045,96 @@ public class TicketServiceTest {
         assertNotNull(exception.getReason());
         assertTrue(exception.getReason().contains("You can only delete your own comments"));
     }
+
+    @Test
+    public void testGetCommentsForTicket_WithUser_Success() {
+
+        // Arrange
+        Comment comment = new Comment();
+        comment.setId(1);
+        comment.setText("Test met aanwezige user");
+        comment.setTimestamp(java.time.LocalDateTime.now());
+
+        User user = new User();
+        user.setUsername("janedoe");
+        comment.setUser(user);
+        when(ticketRepository.existsById(1)).thenReturn(true);
+        when(commentRepository.findByTicketId(1)).thenReturn(List.of(comment));
+
+        // Act
+        List<CommentOutputDto> result = ticketService.getCommentsForTicket(1);
+
+        // Assert
+        assertEquals(1, result.size());
+        assertEquals("janedoe", result.getFirst().getUsername());
+    }
+
+    @Test
+    public void testTransferToDto_CommentWithUser() {
+
+        // Arrange
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+        ticket.setTitle("Test Ticket");
+        ticket.setType(TicketType.BUG);
+        ticket.setStatus(TicketStatus.OPEN);
+
+        Project project = new Project();
+        project.setId(1);
+        ticket.setProject(project);
+
+        User commentUser = new User();
+        commentUser.setUsername("commenter");
+
+        Comment comment = new Comment();
+        comment.setId(1);
+        comment.setText("Hallo");
+        comment.setTimestamp(LocalDateTime.now());
+        comment.setUser(commentUser);
+
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+        when(fileAttachmentRepository.findByTicketId(1)).thenReturn(List.of());
+        when(commentRepository.findByTicketId(1)).thenReturn(List.of(comment));
+
+        // Act
+        TicketOutputDto result = ticketService.getTicketById(1);
+
+        // Assert
+        assertEquals(1, result.getComments().size());
+        assertEquals("commenter", result.getComments().getFirst().getUsername());
+    }
+
+    @Test
+    public void testAddCommentToTicket_WithNonJwtAuth() {
+
+        // Arrange
+        org.springframework.security.core.Authentication auth =
+                new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                        "nonJwtUser", "password", List.of(new SimpleGrantedAuthority("ROLE_DEVELOPER")));
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        Ticket ticket = new Ticket();
+        ticket.setId(1);
+
+        CommentInputDto dto = new CommentInputDto();
+        dto.setText("Opmerking zonder JWT token");
+
+        Comment savedComment = new Comment();
+        savedComment.setId(5);
+        savedComment.setText("Opmerking zonder JWT token");
+        savedComment.setTimestamp(LocalDateTime.now());
+
+        when(ticketRepository.findById(1)).thenReturn(Optional.of(ticket));
+        when(commentRepository.save(any(Comment.class))).thenReturn(savedComment);
+
+        // Act
+        CommentOutputDto result = ticketService.addCommentToTicket(1, dto);
+
+        // Assert
+        assertEquals(5, result.getId());
+        assertEquals("Opmerking zonder JWT token", result.getText());
+        assertNull(result.getUsername());
+
+        verify(userRepository, never()).findByUsername(anyString());
+    }
 }
