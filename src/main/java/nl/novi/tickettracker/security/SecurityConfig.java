@@ -33,12 +33,17 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+
                         // Specifieke acties die alleen de Projectmanager mag doen
                         .requestMatchers(HttpMethod.POST, "/projects").hasRole("PROJECTMANAGER")
                         .requestMatchers(HttpMethod.PUT, "/projects/**").hasRole("PROJECTMANAGER")
 
                         .requestMatchers(HttpMethod.PUT, "/tickets/{id}/assign").hasRole("PROJECTMANAGER")
                         .requestMatchers(HttpMethod.PUT, "/tickets/{id}/project").hasRole("PROJECTMANAGER")
+
+                        .requestMatchers(HttpMethod.DELETE, "/tickets/{ticketId}/comments/{commentId}").hasAnyRole("PROJECTMANAGER")
+                        .requestMatchers(HttpMethod.DELETE, "/tickets/attachments/{attachmentId}").hasAnyRole("PROJECTMANAGER")
+                        .requestMatchers(HttpMethod.DELETE, "/tickets/{id}").hasRole("PROJECTMANAGER")
 
                         // Overige acties vereisen de rollen developer of projectmanager
                         .anyRequest().hasAnyRole("DEVELOPER", "PROJECTMANAGER")
@@ -76,7 +81,7 @@ public class SecurityConfig {
             List<String> roles = (List<String>) rolesList;
 
             return roles.stream()
-                    .map(role -> new SimpleGrantedAuthority(role.toUpperCase()))
+                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()))
                     .collect(Collectors.toList());
         });
 
