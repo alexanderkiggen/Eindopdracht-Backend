@@ -100,7 +100,7 @@ psql --version
 
 ### Stap 1. PostgreSQL-database aanmaken
 
-Start PostgreSQL en maak een nieuwe database aan:
+Start PostgreSQL op in jouw database-client van voorkeur en maak een nieuwe database aan:
 
 ```sql
 CREATE DATABASE tickettracker;
@@ -144,7 +144,7 @@ De gebruikers worden geïmporteerd, maar wachtwoorden worden om veiligheidsreden
 4. Herhaal dit voor alle vier de gebruikers:
 
    | Gebruikersnaam | Wachtwoord  | Rol              |
-   |----------------|-------------|------------------|
+      |----------------|-------------|------------------|
    | johndoe        | 0000        | DEVELOPER        |
    | janedoe        | 0000        | DEVELOPER        |
    | johnsmith      | 0000        | PROJECTMANAGER   |
@@ -152,7 +152,7 @@ De gebruikers worden geïmporteerd, maar wachtwoorden worden om veiligheidsreden
 
 #### Stap 2d. Client secret ophalen
 
-De `client_secret` is nodig voor het ophalen van JWT-tokens. Ga naar:
+De `client_secret` is nodig voor het ophalen van JWT-tokens:
 
 1. Open de Keycloak Admin Console via http://localhost:9090.
 2. Selecteer linksboven de realm tickettracker.
@@ -239,12 +239,6 @@ De volgende gebruikers worden automatisch aangemaakt via `data.sql`. Zorg ervoor
 
 
 ## 8. Overige commando's
-
-### Project bouwen zonder tests
-
-```bash
-mvn clean install -DskipTests
-```
 
 ### Applicatie stoppen
 
