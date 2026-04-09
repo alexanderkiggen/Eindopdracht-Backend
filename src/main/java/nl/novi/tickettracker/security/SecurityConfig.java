@@ -36,8 +36,9 @@ public class SecurityConfig {
 
                         // Specifieke acties die alleen de Projectmanager mag doen
                         .requestMatchers(HttpMethod.POST, "/projects").hasRole("PROJECTMANAGER")
-                        .requestMatchers(HttpMethod.PUT, "/projects/**").hasRole("PROJECTMANAGER")
 
+                        .requestMatchers(HttpMethod.PUT, "/projects/**").hasRole("PROJECTMANAGER")
+                        .requestMatchers(HttpMethod.PUT, "/users/*/profile").hasRole("PROJECTMANAGER")
                         .requestMatchers(HttpMethod.PUT, "/tickets/{id}/assign").hasRole("PROJECTMANAGER")
                         .requestMatchers(HttpMethod.PUT, "/tickets/{id}/project").hasRole("PROJECTMANAGER")
 
