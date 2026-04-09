@@ -797,7 +797,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/tickets?page=2&size=3&sortField=description&sortDirection=ASC",
+              "raw": "http://localhost:8080/tickets?size=10&sortField=id&sortDirection=DESC",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -808,20 +808,16 @@
               ],
               "query": [
                 {
-                  "key": "page",
-                  "value": "2"
-                },
-                {
                   "key": "size",
-                  "value": "3"
+                  "value": "10"
                 },
                 {
                   "key": "sortField",
-                  "value": "description"
+                  "value": "id"
                 },
                 {
                   "key": "sortDirection",
-                  "value": "ASC"
+                  "value": "DESC"
                 }
               ]
             }
@@ -1166,7 +1162,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/tickets/1/status",
+              "raw": "http://localhost:8080/tickets/7/status",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -1174,7 +1170,7 @@
               "port": "8080",
               "path": [
                 "tickets",
-                "1",
+                "7",
                 "status"
               ]
             }
@@ -1691,7 +1687,7 @@
               ]
             },
             "url": {
-              "raw": "http://localhost:8080/tickets/1/attachments",
+              "raw": "http://localhost:8080/tickets/4/attachments",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -1699,7 +1695,7 @@
               "port": "8080",
               "path": [
                 "tickets",
-                "1",
+                "4",
                 "attachments"
               ]
             }
@@ -1772,7 +1768,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/tickets/attachments/1",
+              "raw": "http://localhost:8080/tickets/attachments/4",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -1781,7 +1777,7 @@
               "path": [
                 "tickets",
                 "attachments",
-                "1"
+                "4"
               ]
             }
           },
@@ -1853,7 +1849,7 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/tickets/attachments/1",
+              "raw": "http://localhost:8080/tickets/attachments/4",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -1862,7 +1858,7 @@
               "path": [
                 "tickets",
                 "attachments",
-                "1"
+                "4"
               ]
             }
           },
