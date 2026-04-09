@@ -42,8 +42,8 @@ public class TicketController {
     public ResponseEntity<List<TicketOutputDto>> getAllTickets(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            @RequestParam(value = "sort", defaultValue = "id") String sortField,
-            @RequestParam(value = "dir", defaultValue = "DESC") String sortDirection
+            @RequestParam(value = "sortField", defaultValue = "id") String sortField,
+            @RequestParam(value = "sortDirection", defaultValue = "DESC") String sortDirection
     ) {
         return ResponseEntity.ok(ticketService.getAllTickets(page, size, sortField, sortDirection)); // Status code: 200 Ok
     }

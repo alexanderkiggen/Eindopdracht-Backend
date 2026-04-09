@@ -46,7 +46,9 @@ public class TicketService {
     private final FileAttachmentRepository fileAttachmentRepository;
     private final CommentRepository commentRepository;
 
-    public TicketService(TicketRepository ticketRepository, ProjectRepository projectRepository, UserRepository userRepository, FileAttachmentRepository fileAttachmentRepository, CommentRepository commentRepository) {
+    public TicketService(TicketRepository ticketRepository, ProjectRepository projectRepository,
+                         UserRepository userRepository, FileAttachmentRepository fileAttachmentRepository,
+                         CommentRepository commentRepository) {
         this.ticketRepository = ticketRepository;
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
@@ -67,7 +69,28 @@ public class TicketService {
 
             if (isDeveloper && !isProjectManager) {
                 if (ticket.getAssignedUser() == null || !ticket.getAssignedUser().getUsername().equals(loggedInUsername)) {
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to modify a ticket that is not assigned to you unless you are a project manager.");
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                            "You are not authorized to modify a ticket that is not assigned to you unless you are a project manager.");
+                }
+            }
+        }
+    }
+
+    private void validateAssignmentRights(String assignedUsername) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth != null && auth.getPrincipal() instanceof Jwt jwt) {
+            String loggedInUsername = jwt.getClaimAsString("preferred_username");
+
+            boolean isProjectManager = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_PROJECTMANAGER"));
+            boolean isDeveloper = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_DEVELOPER"));
+
+            if (isDeveloper && !isProjectManager) {
+                if (!assignedUsername.equals(loggedInUsername)) {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                            "As a developer you can only assign a ticket to yourself.");
                 }
             }
         }
@@ -102,6 +125,8 @@ public class TicketService {
     public TicketOutputDto createTicket(TicketInputDto ticketInputDto, MultipartFile file) throws IOException {
         validateFile(file);
 
+        validateAssignmentRights(ticketInputDto.getAssignedUsername());
+
         Ticket ticketEntity = transferToTicket(ticketInputDto);
         Ticket savedTicketEntity = ticketRepository.save(ticketEntity);
 
@@ -119,13 +144,13 @@ public class TicketService {
         Ticket ticketEntity = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new RecordNotFoundException("Ticket with ID " + ticketId + " not found."));
 
+        validateAssignmentRights(username);
+
         User userEntity = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RecordNotFoundException("User with username '" + username + "' not found."));
 
         ticketEntity.setAssignedUser(userEntity);
-        Ticket savedTicketEntity = ticketRepository.save(ticketEntity);
-
-        return transferToDto(savedTicketEntity);
+        return transferToDto(ticketRepository.save(ticketEntity));
     }
 
     public TicketOutputDto updateTicketStatus(Integer ticketId, TicketStatus newStatus) {
@@ -134,9 +159,7 @@ public class TicketService {
 
         validateDeveloperOwnership(ticketEntity);
         ticketEntity.setStatus(newStatus);
-        Ticket savedTicketEntity = ticketRepository.save(ticketEntity);
-
-        return transferToDto(savedTicketEntity);
+        return transferToDto(ticketRepository.save(ticketEntity));
     }
 
     public TicketOutputDto changeTicketProject(Integer ticketId, Integer projectId) {
@@ -147,24 +170,15 @@ public class TicketService {
                 .orElseThrow(() -> new RecordNotFoundException("Project with ID " + projectId + " not found."));
 
         ticket.setProject(project);
-        Ticket savedTicket = ticketRepository.save(ticket);
-
-        return transferToDto(savedTicket);
+        return transferToDto(ticketRepository.save(ticket));
     }
 
     public void deleteTicket(Integer ticketId) {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new RecordNotFoundException("Ticket with ID " + ticketId + " not found."));
 
-        // Verwijder alle gekoppelde attachments
-        List<FileAttachment> attachments = fileAttachmentRepository.findByTicketId(ticketId);
-        fileAttachmentRepository.deleteAll(attachments);
-
-        // Verwijder alle gekoppelde comments
-        List<Comment> comments = commentRepository.findByTicketId(ticketId);
-        commentRepository.deleteAll(comments);
-
-        // Verwijder het ticket
+        fileAttachmentRepository.deleteAll(fileAttachmentRepository.findByTicketId(ticketId));
+        commentRepository.deleteAll(commentRepository.findByTicketId(ticketId));
         ticketRepository.delete(ticket);
     }
 
@@ -204,7 +218,8 @@ public class TicketService {
 
         List<FileAttachment> currentAttachments = fileAttachmentRepository.findByTicketId(ticket.getId());
         if (currentAttachments.size() <= 1) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot delete the last attachment. A ticket must have at least one attachment.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Cannot delete the last attachment. A ticket must have at least one attachment.");
         }
 
         fileAttachmentRepository.delete(attachment);
@@ -260,16 +275,12 @@ public class TicketService {
             throw new RecordNotFoundException("Ticket with ID " + ticketId + " not found.");
         }
 
-        List<Comment> comments = commentRepository.findByTicketId(ticketId);
-
-        return comments.stream().map(c -> {
+        return commentRepository.findByTicketId(ticketId).stream().map(c -> {
             CommentOutputDto dto = new CommentOutputDto();
             dto.setId(c.getId());
             dto.setText(c.getText());
             dto.setTimestamp(c.getTimestamp());
-            if (c.getUser() != null) {
-                dto.setUsername(c.getUser().getUsername());
-            }
+            if (c.getUser() != null) dto.setUsername(c.getUser().getUsername());
             return dto;
         }).toList();
     }
@@ -279,10 +290,7 @@ public class TicketService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortField));
 
         Page<Ticket> ticketPage = ticketRepository.findAll(pageable);
-
-        return ticketPage.stream()
-                .map(this::transferToDto)
-                .collect(Collectors.toList());
+        return ticketPage.stream().map(this::transferToDto).collect(Collectors.toList());
     }
 
     public TicketOutputDto getTicketById(Integer id) {
@@ -295,9 +303,7 @@ public class TicketService {
         if (!projectRepository.existsById(projectId)) {
             throw new RecordNotFoundException("Project with ID " + projectId + " not found.");
         }
-
-        List<Ticket> tickets = ticketRepository.findByProjectId(projectId);
-        return tickets.stream().map(this::transferToDto).toList();
+        return ticketRepository.findByProjectId(projectId).stream().map(this::transferToDto).toList();
     }
 
     private Ticket transferToTicket(TicketInputDto dto) {
@@ -348,9 +354,7 @@ public class TicketService {
                 cDto.setId(c.getId());
                 cDto.setText(c.getText());
                 cDto.setTimestamp(c.getTimestamp());
-                if (c.getUser() != null) {
-                    cDto.setUsername(c.getUser().getUsername());
-                }
+                if (c.getUser() != null) cDto.setUsername(c.getUser().getUsername());
                 return cDto;
             }).toList();
             dto.setComments(commentDtos);
