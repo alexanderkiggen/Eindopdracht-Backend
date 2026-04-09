@@ -3,6 +3,7 @@ package nl.novi.tickettracker.controllers;
 import jakarta.validation.Valid;
 import nl.novi.tickettracker.dtos.ProjectInputDto;
 import nl.novi.tickettracker.dtos.ProjectOutputDto;
+import nl.novi.tickettracker.dtos.ProjectUpdateDto;
 import nl.novi.tickettracker.services.ProjectService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +42,9 @@ public class ProjectController {
 
     // Postman Request: [Project] Update Project
     @PutMapping("/{id}")
-    public ResponseEntity<ProjectOutputDto> updateProject(@PathVariable("id") Integer id, @Valid @RequestBody ProjectInputDto dto) {
+    public ResponseEntity<ProjectOutputDto> updateProject(
+            @PathVariable("id") Integer id,
+            @RequestBody ProjectUpdateDto dto) {
         return ResponseEntity.ok(projectService.updateProject(id, dto)); // Status code: 200 Ok
     }
 }

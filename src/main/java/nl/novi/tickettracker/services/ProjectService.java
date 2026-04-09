@@ -2,6 +2,7 @@ package nl.novi.tickettracker.services;
 
 import nl.novi.tickettracker.dtos.ProjectInputDto;
 import nl.novi.tickettracker.dtos.ProjectOutputDto;
+import nl.novi.tickettracker.dtos.ProjectUpdateDto;
 import nl.novi.tickettracker.models.Project;
 import nl.novi.tickettracker.repositories.ProjectRepository;
 import nl.novi.tickettracker.exceptions.RecordNotFoundException;
@@ -31,9 +32,7 @@ public class ProjectService {
             project.setStartDate(dto.getStartDate());
         }
 
-        Project savedProject = projectRepository.save(project);
-
-        return transferToDto(savedProject);
+        return transferToDto(projectRepository.save(project));
     }
 
     public List<ProjectOutputDto> getAllProjects() {
@@ -48,19 +47,38 @@ public class ProjectService {
         return transferToDto(project);
     }
 
-    public ProjectOutputDto updateProject(Integer id, ProjectInputDto dto) {
+    public ProjectOutputDto updateProject(Integer id, ProjectUpdateDto dto) {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException("Project with ID " + id + " not found."));
 
-        project.setName(dto.getName());
-        project.setDescription(dto.getDescription());
-
+        if (dto.getName() != null && !dto.getName().isBlank()) {
+            project.setName(dto.getName());
+        }
+        if (dto.getDescription() != null) {
+            project.setDescription(dto.getDescription());
+        }
         if (dto.getStartDate() != null) {
             project.setStartDate(dto.getStartDate());
         }
 
-        Project updatedProject = projectRepository.save(project);
-        return transferToDto(updatedProject);
+        return transferToDto(projectRepository.save(project));
+    }
+
+    public ProjectOutputDto updateProject(Integer id, ProjectInputDto dto) {
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("Project with ID " + id + " not found."));
+
+        if (dto.getName() != null && !dto.getName().isBlank()) {
+            project.setName(dto.getName());
+        }
+        if (dto.getDescription() != null) {
+            project.setDescription(dto.getDescription());
+        }
+        if (dto.getStartDate() != null) {
+            project.setStartDate(dto.getStartDate());
+        }
+
+        return transferToDto(projectRepository.save(project));
     }
 
     private ProjectOutputDto transferToDto(Project project) {
