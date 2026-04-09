@@ -18,7 +18,7 @@
               "oauth2": [
                 {
                   "key": "tokenName",
-                  "value": "TicketTrackerAuth",
+                  "value": "TicketTrackerAuth JohnDoe",
                   "type": "string"
                 },
                 {
@@ -236,7 +236,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"bio\": \"Junior Backend Developer\",\r\n  \"phone\": \"0645325678\",\r\n  \"birthdate\": \"1990-12-08T00:00:00\"\r\n}",
+              "raw": "{\r\n  \"bio\": \"Junior Backend Developer!\",\r\n  \"phone\": \"0645325678\",\r\n  \"birthdate\": \"1990-12-08T00:00:00\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -244,7 +244,7 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/users/johndoe/profile",
+              "raw": "http://localhost:8080/users/johnsmith/profile",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -252,7 +252,7 @@
               "port": "8080",
               "path": [
                 "users",
-                "johndoe",
+                "johnsmith",
                 "profile"
               ]
             }
@@ -497,14 +497,15 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/projects",
+              "raw": "http://localhost:8080/projects/1",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
               "port": "8080",
               "path": [
-                "projects"
+                "projects",
+                "1"
               ]
             }
           },
@@ -704,7 +705,7 @@
                 },
                 {
                   "key": "projectId",
-                  "value": "1",
+                  "value": "2",
                   "type": "text",
                   "uuid": "79f4fa4b-09c6-4669-89ba-5693a45fa420"
                 },
@@ -796,7 +797,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/tickets?page=0&size=20&sortField=id&sortDirection=ASC",
+              "raw": "http://localhost:8080/tickets?page=2&size=3&sortField=description&sortDirection=ASC",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -808,15 +809,15 @@
               "query": [
                 {
                   "key": "page",
-                  "value": "0"
+                  "value": "2"
                 },
                 {
                   "key": "size",
-                  "value": "20"
+                  "value": "3"
                 },
                 {
                   "key": "sortField",
-                  "value": "id"
+                  "value": "description"
                 },
                 {
                   "key": "sortDirection",
@@ -986,7 +987,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/tickets/1werw",
+              "raw": "http://localhost:8080/tickets/1",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -994,7 +995,7 @@
               "port": "8080",
               "path": [
                 "tickets",
-                "1werw"
+                "1"
               ]
             }
           },
